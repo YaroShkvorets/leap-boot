@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import time
+import inspect
 
 args = None
 logFile = None
@@ -30,22 +31,32 @@ systemAccounts = [
 ]
 
 def stepTitle():
-    calling_function = stepTitle.__name__
+    calling_frame = inspect.currentframe().f_back
+    calling_function = calling_frame.f_code.co_name
+
     total_width = 80
     title_width = len(calling_function)
     padding = (total_width - title_width) // 2
     separator = "*" * total_width
 
-    empty_line = "*" + " " * (total_width - 2) + "*"
-    title_line = f"*{' ' * padding}{calling_function}{' ' * padding}*"
+    empty_line = "*" + " " * (total_width - 2)
+    title_line = f"*{' ' * padding}{calling_function}{' ' * padding}"
+
+    # Get the calling function's arguments
+    calling_args = inspect.signature(calling_frame.f_globals[calling_function]).parameters
+    params_str = ', '.join([f"{arg}={repr(calling_frame.f_locals[arg])}" for arg in calling_args])
+
+    params_line = f"*{' ' * padding}{params_str}{' ' * padding}"
 
     print()
     print(separator)
     print(empty_line)  # Extra empty line before the title
     print(title_line)
+    print(params_line)  # Print parameters line
     print(empty_line)  # Extra empty line after the title
     print(separator)
     print()
+
 
 def jsonArg(a):
     return " '" + json.dumps(a) + "' "
