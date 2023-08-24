@@ -42,17 +42,10 @@ def stepTitle():
     empty_line = "*" + " " * (total_width - 2)
     title_line = f"*{' ' * padding}{calling_function}{' ' * padding}"
 
-    # Get the calling function's arguments
-    calling_args = inspect.signature(calling_frame.f_globals[calling_function]).parameters
-    params_str = ', '.join([f"{arg}={repr(calling_frame.f_locals[arg])}" for arg in calling_args])
-
-    params_line = f"*{' ' * padding}{params_str}{' ' * padding}"
-
     print()
     print(separator)
     print(empty_line)  # Extra empty line before the title
     print(title_line)
-    print(params_line)  # Print parameters line
     print(empty_line)  # Extra empty line after the title
     print(separator)
     print()
@@ -101,10 +94,10 @@ def startWallet():
     run('mkdir -p ' + os.path.abspath(args.wallet_dir))
     background(args.keosd + ' --unlock-timeout %d --http-server-address 127.0.0.1:6666 --http-max-response-time-ms 99999 --wallet-dir %s' % (unlockTimeout, os.path.abspath(args.wallet_dir)))
     sleep(.4)
-    run(args.cleos + 'wallet create --name test --to-console')
+    run(args.cleos + 'wallet create --to-console')
 
 def importKeys():
-    run(args.cleos + 'wallet import --name test --private-key ' + args.private_key)
+    run(args.cleos + 'wallet import --private-key ' + args.private_key)
     keys = {}
     for a in accounts:
         key = a['pvt']
@@ -112,13 +105,13 @@ def importKeys():
             if len(keys) >= args.max_user_keys:
                 break
             keys[key] = True
-            run(args.cleos + 'wallet import --name test --private-key ' + key)
+            run(args.cleos + 'wallet import --private-key ' + key)
     for i in range(firstProducer, firstProducer + numProducers):
         a = accounts[i]
         key = a['pvt']
         if not key in keys:
             keys[key] = True
-            run(args.cleos + 'wallet import --name test --private-key ' + key)
+            run(args.cleos + 'wallet import --private-key ' + key)
 
 def startNode(nodeIndex, account):
     dir = args.nodes_dir + ('%02d-' % nodeIndex) + account['name'] + '/'
@@ -446,7 +439,7 @@ commands = [
     ('P', 'start-prod',         stepStartProducers,         True,    "Start producers"),
     ('v', 'vote',               stepVote,                   True,    "Vote for producers"),
     ('R', 'claim',              claimRewards,               True,    "Claim rewards"),
-    ('x', 'proxy',              stepProxyVotes,             True,    "Proxy votes"),
+    ('x', 'proxy',              stepProxyVotes,             False,    "Proxy votes"),
     ('q', 'resign',             stepResign,                 True,    "Resign eosio"),
     ('m', 'msg-replace',        msigReplaceSystem,          False,   "Replace system contract using msig"),
     ('X', 'xfer',               stepTransfer,               False,   "Random transfer tokens (infinite loop)"),
