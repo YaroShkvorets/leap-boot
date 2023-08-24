@@ -29,6 +29,24 @@ systemAccounts = [
     'eosio.rex',
 ]
 
+def stepTitle():
+    calling_function = stepTitle.__name__
+    total_width = 80
+    title_width = len(calling_function)
+    padding = (total_width - title_width) // 2
+    separator = "*" * total_width
+
+    empty_line = "*" + " " * (total_width - 2) + "*"
+    title_line = f"*{' ' * padding}{calling_function}{' ' * padding}*"
+
+    print()
+    print(separator)
+    print(empty_line)  # Extra empty line before the title
+    print(title_line)
+    print(empty_line)  # Extra empty line after the title
+    print(separator)
+    print()
+
 def jsonArg(a):
     return " '" + json.dumps(a) + "' "
 
@@ -281,20 +299,25 @@ def produceNewAccounts():
             f.write('        {"name":"%s", "pvt":"%s", "pub":"%s"},\n' % (name, r[1], r[2]))
 
 def stepStartWallet():
+    stepTitle()
     startWallet()
     importKeys()
 def stepStartBoot():
+    stepTitle()
     startNode(0, {'name': 'eosio', 'pvt': args.private_key, 'pub': args.public_key})
     sleep(10.0)
 def stepInstallSystemContracts():
+    stepTitle()
     run(args.cleos + 'set contract eosio.token ' + args.contracts_dir + '/eosio.token/')
     run(args.cleos + 'set contract eosio.msig ' + args.contracts_dir + '/eosio.msig/')
 def stepCreateTokens():
+    stepTitle()
     run(args.cleos + 'push action eosio.token create \'["eosio", "10000000000.0000 %s"]\' -p eosio.token' % (args.symbol))
     totalAllocation = allocateFunds(0, len(accounts))
     run(args.cleos + 'push action eosio.token issue \'["eosio", "%s", "memo"]\' -p eosio' % intToCurrency(totalAllocation))
     sleep(1)
 def stepSetSystemContract():
+    stepTitle()
     # All of the protocol upgrade features introduced in v1.8 first require a special protocol 
     # feature (codename PREACTIVATE_FEATURE) to be activated and for an updated version of the system 
     # contract that makes use of the functionality introduced by that feature to be deployed. 
@@ -358,32 +381,41 @@ def stepSetSystemContract():
     sleep(3)
 
 def stepInitSystemContract():
+    stepTitle()
     run(args.cleos + 'push action eosio init' + jsonArg(['0', '4,' + args.symbol]) + '-p eosio@active')
     sleep(1)
 def stepCreateStakedAccounts():
+    stepTitle()
     createStakedAccounts(0, len(accounts))
 def stepRegProducers():
+    stepTitle()
     regProducers(firstProducer, firstProducer + numProducers)
     sleep(1)
     listProducers()
 def stepStartProducers():
+    stepTitle()
     startProducers(firstProducer, firstProducer + numProducers)
     sleep(args.producer_sync_delay)
 def stepVote():
+    stepTitle()
     vote(0, 0 + args.num_voters)
     sleep(1)
     listProducers()
     sleep(5)
 def stepProxyVotes():
+    stepTitle()
     proxyVotes(0, 0 + args.num_voters)
 def stepResign():
+    stepTitle()
     resign('eosio', 'eosio.prods')
     for a in systemAccounts:
         resign(a, 'eosio')
 def stepTransfer():
+    stepTitle()
     while True:
         randomTransfer(0, args.num_senders)
 def stepLog():
+    stepTitle()
     run('tail -n 60 ' + args.nodes_dir + '00-eosio/stderr')
 
 # Command Line Arguments
