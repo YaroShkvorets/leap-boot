@@ -524,8 +524,8 @@ logFile = open(args.log_path, 'a')
 
 logFile.write('\n\n' + '*' * 80 + '\n\n\n')
 
-run('killall nodeos')
-run('killall keosd')
+background('killall nodeos')
+background('killall keosd')
 
 with open('accounts.json') as f:
     a = json.load(f)
