@@ -415,7 +415,46 @@ def stepSetSystemContract():
     # setpriv is only available after eosio.system is installed
     run(getCleos() + 'push action eosio setpriv' + jsonArg(['eosio.msig', 1]) + '-p eosio@active')
     sleep(3)
-
+# "EOS5MHPYyhjBjnQZejzZHqHewPWhGTfQWSVTWYEhDmJu4SXkzgweP"
+def stepBattlefield():
+    stepTitle()
+    retry(getCleos() + 'set account permission battlefield1 active --add-code')
+    retry(getCleos() + 'set account permission battlefield2 active --add-code')
+    retry(getCleos() + 'set account permission battlefield3 active --add-code')
+    retry(getCleos() + 'set account permission battlefield4 active --add-code')
+    retry(getCleos() + 'set account permission notified2 active --add-code')
+    retry(getCleos() + 'set account permission battlefield5 active \'{ \
+        "threshold": 5, \
+        "keys": [], \
+        "waits": [{"wait_sec: 10800, weight: 1}], \
+        "accounts": [ \
+            {"permission":{"actor":"battlefield1","permission":"active"},"weight":2},\
+            {"permission":{"actor":"battlefield3","permission":"active"},"weight":2},\
+            {"permission":{"actor":"battlefield4","permission":"active"},"weight":2},\
+            {"permission":{"actor":"zzzzzzzzzzzz","permission":"active"},"weight":1}\
+        ]}\' \
+    ')
+    retry(getCleos() + 'set account permission battlefield5 day2day \'{ \
+        "threshold": 1, \
+        "keys": [], \
+        "accounts": [ \
+            {"permission":{"actor":"battlefield1","permission":"active"},"weight":1},\
+            {"permission":{"actor":"battlefield3","permission":"active"},"weight":1},\
+            {"permission":{"actor":"battlefield4","permission":"active"},"weight":1}\
+        ]}\' \
+    ')
+    retry(getCleos() + 'set account permission battlefield4 owner \'{ \
+        "threshold": 5, \
+        "keys": [], \
+        "waits": [{"wait_sec: 86400, weight: 1},{"wait_sec: 604800, weight: 2}], \
+        "accounts": [ \
+            {"permission":{"actor":"battlefield1","permission":"active"},"weight":2},\
+            {"permission":{"actor":"battlefield2","permission":"active"},"weight":2},\
+            {"permission":{"actor":"battlefield3","permission":"active"},"weight":2},\
+            {"permission":{"actor":"battlefield5","permission":"active"},"weight":2}\
+        ]}\' \
+    ')
+    retry(getCleos() + 'set contract battlefield ' + args.contracts_dir + '/eosio.boot/')
 def stepInitSystemContract():
     stepTitle()
     run(getCleos() + 'push action eosio init' + jsonArg(['0', '4,' + args.symbol]) + '-p eosio@active')
@@ -471,15 +510,16 @@ commands = [
     ('t', 'tokens',             stepCreateTokens,           True,    "Create tokens"),
     ('S', 'sys-contract',       stepSetSystemContract,      True,    "Set system contract"),
     ('I', 'init-sys-contract',  stepInitSystemContract,     True,    "Initialiaze system contract"),
-    ('T', 'stake',              stepCreateStakedAccounts,   True,    "Create staked accounts"),
-    ('p', 'reg-prod',           stepRegProducers,           True,    "Register producers"),
-    ('P', 'start-prod',         stepStartProducers,         True,    "Start producers"),
-    ('v', 'vote',               stepVote,                   True,    "Vote for producers"),
-    ('R', 'claim',              claimRewards,               True,    "Claim rewards"),
-    ('x', 'proxy',              stepProxyVotes,             True,    "Proxy votes"),
-    ('q', 'resign',             stepResign,                 True,    "Resign eosio"),
-    ('m', 'msg-replace',        msigReplaceSystem,          False,   "Replace system contract using msig"),
-    ('X', 'xfer',               stepTransfer,               False,   "Random transfer tokens (infinite loop)"),
+    ('f', 'battlefield',        stepBattlefield,            True,    "Run battlefield tests"),
+    # ('T', 'stake',              stepCreateStakedAccounts,   True,    "Create staked accounts"),
+    # ('p', 'reg-prod',           stepRegProducers,           True,    "Register producers"),
+    # ('P', 'start-prod',         stepStartProducers,         True,    "Start producers"),
+    # ('v', 'vote',               stepVote,                   True,    "Vote for producers"),
+    # ('R', 'claim',              claimRewards,               True,    "Claim rewards"),
+    # ('x', 'proxy',              stepProxyVotes,             True,    "Proxy votes"),
+    # ('q', 'resign',             stepResign,                 True,    "Resign eosio"),
+    # ('m', 'msg-replace',        msigReplaceSystem,          False,   "Replace system contract using msig"),
+    # ('X', 'xfer',               stepTransfer,               False,   "Random transfer tokens (infinite loop)"),
     ('l', 'log',                stepLog,                    True,    "Show tail of node's log"),
     ('k', 'killall',            stepKillall,                False,    "Killall in the end"),
 ]
