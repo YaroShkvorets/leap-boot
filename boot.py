@@ -157,6 +157,28 @@ def startNode(nodeIndex, account):
         f.write(cmd + '\n\n')
     background(cmd + '    2>>' + dir + 'stderr')
 
+def startDmNode():
+    dir = args.nodes_dir + 'deepmind-node/'
+    run('rm -rf ' + dir)
+    run('mkdir -p ' + dir)
+    otherOpts = ''
+    cmd = (
+        args.nodeos +
+        '    --genesis-json ' + os.path.abspath(args.genesis) +
+        '    --blocks-dir ' + os.path.abspath(dir) + '/blocks'
+        '    --config-dir ' + os.path.abspath(dir) +
+        '    --data-dir ' + os.path.abspath(dir) +
+        '    --deep-mind ' +
+        '    --contracts-console ' +
+        '    --api-accept-transactions false ' +
+        '    --p2p-accept-transactions false ' +
+        '    --p2p-peer-address localhost:9000 ' +
+        '    --p2p-listen-endpoint 0.0.0.0:7999 ' +
+        otherOpts)
+    with open(dir + 'stderr', mode='w') as f:
+        f.write(cmd + '\n\n')
+    background(cmd + '  1> '+os.path.abspath(args.dmlog_path) + ' 2>>' + dir + 'stderr')
+
 def startProducers(b, e):
     for i in range(b, e):
         startNode(i - b + 1, accounts[i])
@@ -316,6 +338,10 @@ def stepStartBoot():
     stepTitle()
     startNode(0, {'name': 'eosio', 'pvt': args.private_key, 'pub': args.public_key})
     sleep(10.0)
+def stepStartDM():
+    stepTitle()
+    startDmNode()
+    sleep(1)
 def stepInstallSystemContracts():
     stepTitle()
     run(getCleos() + 'set contract eosio.token ' + args.contracts_dir + '/eosio.token/')
@@ -435,6 +461,7 @@ parser = argparse.ArgumentParser()
 commands = [
     ('w', 'wallet',             stepStartWallet,            True,    "Start keosd, create wallet, fill with keys"),
     ('b', 'boot',               stepStartBoot,              True,    "Start boot node"),
+    ('d', 'dm',                 stepStartDM,                True,    "Start deep-mind node"),
     ('s', 'sys',                createSystemAccounts,       True,    "Create system accounts (eosio.*)"),
     ('c', 'contracts',          stepInstallSystemContracts, True,    "Install system contracts (token, msig)"),
     ('t', 'tokens',             stepCreateTokens,           True,    "Create tokens"),
@@ -463,6 +490,7 @@ parser.add_argument('--nodes-dir', metavar='', help="Path to nodes directory", d
 parser.add_argument('--genesis', metavar='', help="Path to genesis.json", default="./genesis.json")
 parser.add_argument('--wallet-dir', metavar='', help="Path to wallet directory", default='./wallet/')
 parser.add_argument('--log-path', metavar='', help="Path to log file", default='./output.log')
+parser.add_argument('--dmlog-path', metavar='', help="Path to deepmind log file", default='./dm.log')
 parser.add_argument('--symbol', metavar='', help="The eosio.system symbol", default='SYS')
 parser.add_argument('--user-limit', metavar='', help="Max number of users. (0 = no limit)", type=int, default=3000)
 parser.add_argument('--max-user-keys', metavar='', help="Maximum user keys to import into wallet", type=int, default=10)
