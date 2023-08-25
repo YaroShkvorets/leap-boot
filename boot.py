@@ -514,7 +514,7 @@ for (flag, command, function, inAll, help) in commands:
         parser.add_argument('-' + flag, '--' + command, action='store_true', help=help, dest=command)
     else:
         parser.add_argument('--' + command, action='store_true', help=help, dest=command)
-        
+
 args = parser.parse_args()
 
 # Leave a space in front of --url in case the user types cleos alone
@@ -523,6 +523,9 @@ args = parser.parse_args()
 logFile = open(args.log_path, 'a')
 
 logFile.write('\n\n' + '*' * 80 + '\n\n\n')
+
+run('killall nodeos')
+run('killall keosd')
 
 with open('accounts.json') as f:
     a = json.load(f)
