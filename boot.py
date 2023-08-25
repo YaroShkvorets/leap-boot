@@ -481,7 +481,7 @@ commands = [
     ('m', 'msg-replace',        msigReplaceSystem,          False,   "Replace system contract using msig"),
     ('X', 'xfer',               stepTransfer,               False,   "Random transfer tokens (infinite loop)"),
     ('l', 'log',                stepLog,                    True,    "Show tail of node's log"),
-    ('k', 'killall',            stepKillall,                True,    "Killall in the end"),
+    ('k', 'killall',            stepKillall,                False,    "Killall in the end"),
 ]
 
 parser.add_argument('--public-key', metavar='', help="EOSIO Public Key", default='EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr', dest="public_key")
@@ -529,8 +529,7 @@ logFile = open(args.log_path, 'a')
 
 logFile.write('\n\n' + '*' * 80 + '\n\n\n')
 
-background('killall nodeos')
-background('killall keosd')
+background('killall nodeos keosd > /dev/null 2>&1')
 
 with open('accounts.json') as f:
     a = json.load(f)
