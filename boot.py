@@ -453,6 +453,10 @@ def stepTransfer():
 def stepLog():
     stepTitle()
     run('tail -n 60 ' + args.nodes_dir + '00-eosio/stderr')
+def stepKillall():
+    stepTitle()
+    run('killall nodeos keosd || true')
+    sleep(1)
 
 # Command Line Arguments
 
@@ -477,6 +481,7 @@ commands = [
     ('m', 'msg-replace',        msigReplaceSystem,          False,   "Replace system contract using msig"),
     ('X', 'xfer',               stepTransfer,               False,   "Random transfer tokens (infinite loop)"),
     ('l', 'log',                stepLog,                    True,    "Show tail of node's log"),
+    ('k', 'killall',            stepKillall,                True,    "Killall in the end"),
 ]
 
 parser.add_argument('--public-key', metavar='', help="EOSIO Public Key", default='EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr', dest="public_key")
