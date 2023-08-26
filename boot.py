@@ -195,7 +195,7 @@ def allocateFunds(b, e):
     dist = numpy.random.pareto(1.161, e - b).tolist() # 1.161 = 80/20 rule
     dist.sort()
     dist.reverse()
-    factor = 1_000_000_000 / sum(dist)
+    factor = 500_000_000 / sum(dist)
     total = 0
     for i in range(b, e):
         funds = round(factor * dist[i - b] * 10000)
@@ -351,7 +351,7 @@ def stepCreateTokens():
     stepTitle()
     run(getCleos() + 'push action eosio.token create \'["eosio", "10000000000.0000 %s"]\' -p eosio.token' % (args.symbol))
     totalAllocation = allocateFunds(0, len(accounts))
-    run(getCleos() + 'push action eosio.token issue \'["eosio", "%s", "memo"]\' -p eosio' % intToCurrency(totalAllocation))
+    run(getCleos() + 'push action eosio.token issue \'["eosio", "10000000000.0000 %s", "memo"]\' -p eosio' % (args.symbol))
     sleep(1)
 def stepSetSystemContract():
     stepTitle()
@@ -447,12 +447,10 @@ def stepBattlefield():
     ')
     
     print('\nSetting contracts')
-    retry(getCleos() + 'system buyram battlefield1 battlefield1 "' + intToCurrency(70000) + '"')
-    retry(getCleos() + 'system buyram battlefield3 battlefield3 "' + intToCurrency(70000) + '"')
-    retry(getCleos() + 'system buyram notified2 notified2 "' + intToCurrency(70000) + '"')
-    retry(getCleos() + 'system buyram battlefield2 battlefield1 "' + intToCurrency(70000) + '"')
-    retry(getCleos() + 'system buyram battlefield4 battlefield3 "' + intToCurrency(70000) + '"')
-    retry(getCleos() + 'system buyram notified1 notified2 "' + intToCurrency(70000) + '"')
+    retry(getCleos() + 'system buyram eosio battlefield1 --kbytes 20000')
+    retry(getCleos() + 'system buyram eosio battlefield3 --kbytes 1000')
+    retry(getCleos() + 'system buyram eosio notified2 --kbytes 1000')
+    sleep(0.6)
     
     retry(getCleos() + 'set contract battlefield1 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
     retry(getCleos() + 'set contract battlefield3 ./battlefield battlefield-with-handler.wasm battlefield-with-handler.abi')
@@ -592,6 +590,13 @@ def stepBattlefield():
     retry(getCleos() + 'push action battlefield1 optiontest \'[null]\' -p battlefield1')
     sleep(0.6)
 
+    # create a bunch of rows
+    for i in range(1, 500):
+        retry(getCleos() + 'push action battlefield1 producerows \'{"row_count":' + str(i) + '}\' -p battlefield1 > /dev/null')
+    
+    sleep(3)
+
+
 def stepInitSystemContract():
     stepTitle()
     run(getCleos() + 'push action eosio init' + jsonArg(['0', '4,' + args.symbol]) + '-p eosio@active')
@@ -648,15 +653,15 @@ commands = [
     ('S', 'sys-contract',       stepSetSystemContract,      True,    "Set system contract"),
     ('I', 'init-sys-contract',  stepInitSystemContract,     True,    "Initialiaze system contract"),
     ('T', 'stake',              stepCreateStakedAccounts,   True,    "Create staked accounts"),
+    ('p', 'reg-prod',           stepRegProducers,           True,    "Register producers"),
+    ('P', 'start-prod',         stepStartProducers,         True,    "Start producers"),
+    ('v', 'vote',               stepVote,                   True,    "Vote for producers"),
+    ('R', 'claim',              claimRewards,               True,    "Claim rewards"),
+    ('x', 'proxy',              stepProxyVotes,             True,    "Proxy votes"),
+    ('q', 'resign',             stepResign,                 True,    "Resign eosio"),
     ('f', 'battlefield',        stepBattlefield,            True,    "Run battlefield tests"),
-    # ('p', 'reg-prod',           stepRegProducers,           True,    "Register producers"),
-    # ('P', 'start-prod',         stepStartProducers,         True,    "Start producers"),
-    # ('v', 'vote',               stepVote,                   True,    "Vote for producers"),
-    # ('R', 'claim',              claimRewards,               True,    "Claim rewards"),
-    # ('x', 'proxy',              stepProxyVotes,             True,    "Proxy votes"),
-    # ('q', 'resign',             stepResign,                 True,    "Resign eosio"),
-    # ('m', 'msg-replace',        msigReplaceSystem,          False,   "Replace system contract using msig"),
-    # ('X', 'xfer',               stepTransfer,               False,   "Random transfer tokens (infinite loop)"),
+    ('m', 'msg-replace',        msigReplaceSystem,          False,   "Replace system contract using msig"),
+    ('X', 'xfer',               stepTransfer,               False,   "Random transfer tokens (infinite loop)"),
     ('l', 'log',                stepLog,                    True,    "Show tail of node's log"),
     ('k', 'killall',            stepKillall,                False,    "Killall in the end"),
 ]
@@ -675,8 +680,8 @@ parser.add_argument('--log-path', metavar='', help="Path to log file", default='
 parser.add_argument('--dmlog-path', metavar='', help="Path to deepmind log file", default='./dm.log')
 parser.add_argument('--symbol', metavar='', help="The eosio.system symbol", default='SYS')
 parser.add_argument('--user-limit', metavar='', help="Max number of users. (0 = no limit)", type=int, default=3000)
-parser.add_argument('--max-user-keys', metavar='', help="Maximum user keys to import into wallet", type=int, default=10)
-parser.add_argument('--ram-funds', metavar='', help="How much funds for each user to spend on ram", type=float, default=0.1)
+parser.add_argument('--max-user-keys', metavar='', help="Maximum user keys to import into wallet", type=int, default=100)
+parser.add_argument('--ram-funds', metavar='', help="How much funds for each user to spend on ram", type=float, default=10)
 parser.add_argument('--min-stake', metavar='', help="Minimum stake before allocating unstaked funds", type=float, default=0.9)
 parser.add_argument('--max-unstaked', metavar='', help="Maximum unstaked funds", type=float, default=10)
 parser.add_argument('--producer-limit', metavar='', help="Maximum number of producers. (0 = no limit)", type=int, default=0)
