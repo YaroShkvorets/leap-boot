@@ -23,8 +23,8 @@ case $choice in
         COMPILER="blanc++"
         ;;
     *)
-        echo "Invalid choice, defaulting to blanc++"
-        COMPILER="blanc++"
+        echo "Invalid choice, defaulting to cdt-cpp"
+        COMPILER="cdt-cpp"
         ;;
 esac
 

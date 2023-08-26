@@ -1,6 +1,6 @@
 {
     "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
-    "version": "eosio::abi/1.1",
+    "version": "eosio::abi/1.2",
     "types": [
         {
             "new_type_name": "varying_action",
@@ -549,19 +549,17 @@
     "variants": [
         {
             "name": "variant_int8_uint16_uint32_int32",
-            "types": [
-                "int8",
-                "uint16",
-                "uint32",
-                "int32"
-            ]
+            "types": ["int8","uint16","uint32","int32"]
         },
         {
             "name": "variant_uint16_string",
-            "types": [
-                "uint16",
-                "string"
-            ]
+            "types": ["uint16","string"]
+        }
+    ],
+    "action_results": [
+        {
+            "name": "retvalue",
+            "result_type": "uint32"
         }
     ]
 }
