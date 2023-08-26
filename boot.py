@@ -73,6 +73,7 @@ def retry(args):
         logFile.write(args + '\n')
         if subprocess.call(args, shell=True):
             print('*** Retry')
+            sleep(1)
         else:
             break
 
@@ -418,6 +419,7 @@ def stepSetSystemContract():
 # "EOS5MHPYyhjBjnQZejzZHqHewPWhGTfQWSVTWYEhDmJu4SXkzgweP"
 def stepBattlefield():
     stepTitle()
+
     retry(getCleos() + 'set account permission battlefield1 active --add-code')
     retry(getCleos() + 'set account permission battlefield2 active --add-code')
     retry(getCleos() + 'set account permission battlefield3 active --add-code')
@@ -426,7 +428,7 @@ def stepBattlefield():
     retry(getCleos() + 'set account permission battlefield5 active \'{ \
         "threshold": 5, \
         "keys": [], \
-        "waits": [{"wait_sec: 10800, weight: 1}], \
+        "waits": [{"wait_sec": 10800, "weight": 1}], \
         "accounts": [ \
             {"permission":{"actor":"battlefield1","permission":"active"},"weight":2},\
             {"permission":{"actor":"battlefield3","permission":"active"},"weight":2},\
@@ -443,18 +445,153 @@ def stepBattlefield():
             {"permission":{"actor":"battlefield4","permission":"active"},"weight":1}\
         ]}\' \
     ')
-    retry(getCleos() + 'set account permission battlefield4 owner \'{ \
-        "threshold": 5, \
-        "keys": [], \
-        "waits": [{"wait_sec: 86400, weight: 1},{"wait_sec: 604800, weight: 2}], \
-        "accounts": [ \
-            {"permission":{"actor":"battlefield1","permission":"active"},"weight":2},\
-            {"permission":{"actor":"battlefield2","permission":"active"},"weight":2},\
-            {"permission":{"actor":"battlefield3","permission":"active"},"weight":2},\
-            {"permission":{"actor":"battlefield5","permission":"active"},"weight":2}\
-        ]}\' \
-    ')
-    retry(getCleos() + 'set contract battlefield ' + args.contracts_dir + '/eosio.boot/')
+    
+    print('\nSetting contracts')
+    retry(getCleos() + 'system buyram battlefield1 battlefield1 "' + intToCurrency(70000) + '"')
+    retry(getCleos() + 'system buyram battlefield3 battlefield3 "' + intToCurrency(70000) + '"')
+    retry(getCleos() + 'system buyram notified2 notified2 "' + intToCurrency(70000) + '"')
+    retry(getCleos() + 'system buyram battlefield2 battlefield1 "' + intToCurrency(70000) + '"')
+    retry(getCleos() + 'system buyram battlefield4 battlefield3 "' + intToCurrency(70000) + '"')
+    retry(getCleos() + 'system buyram notified1 notified2 "' + intToCurrency(70000) + '"')
+    
+    retry(getCleos() + 'set contract battlefield1 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
+    retry(getCleos() + 'set contract battlefield3 ./battlefield battlefield-with-handler.wasm battlefield-with-handler.abi')
+    retry(getCleos() + 'set contract notified2 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 dbupd \'{"account": "battlefield2"}\' -p battlefield2')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 dbrem \'{"account": "battlefield1"}\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    retry(getCleos() + 'push action battlefield1 dtrxcancel \'{"account": "battlefield1"}\' -p battlefield1')
+    sleep(0.6)
+
+    background(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": true, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    print("\nThe error message you see above ^^^ is OK, we were expecting the transaction to fail, continuing....")
+    sleep(0.6)
+
+    # `send_deferred` with `replace_existing` enabled, to test `MODIFY` clauses.
+    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "2"}\' -p battlefield1')
+    sleep (0.6)
+
+    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    print('\nWaiting for the transaction to fail (no onerror handler)...')
+    sleep(1.1)
+
+    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": true, "delay_sec": 1, "nonce": "2"}\' -p battlefield1')
+    print('\nWaiting for the transaction to fail (no onerror handler)...')
+    sleep(1.1)
+
+    retry(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield3')
+    print('\nWaiting for the transaction to fail (with onerror handler that succeed)...')
+    sleep(1.1)
+
+    retry(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "f"}\' -p battlefield3')
+    print('\nWaiting for the transaction to fail (with onerror handler that failed)...')
+    sleep(1.1)
+
+    retry(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "nf"}\' -p battlefield3')
+    print('\nWaiting for the transaction to fail (with onerror handler that failed inside a nested action)...')
+    sleep(1.1)
+
+    retry(getCleos() + 'push action battlefield1 dbinstwo \'{"account": "battlefield1", "first": 100, "second": 101}\' -p battlefield1')
+    # This TX will do one DB_OPERATION for writing, and the second will fail. We want our instrumentation NOT to keep that DB_OPERATION.
+
+    retry(getCleos() + 'push action --delay-sec=1 battlefield1 dbinstwo \'{"account": "battlefield1", "first": 102, "second": 100}\' -p battlefield1')
+    print('\nWaiting for the transaction to fail, yet attempt to write to storage')
+    sleep(1.1)
+
+    retry(getCleos() + 'push action battlefield1 dbremtwo \'{"account": "battlefield1", "first": 100, "second": 101}\' -p battlefield1')
+    # This TX will show a delay transaction (deferred) that succeeds
+    retry(getCleos() + 'push action --delay-sec=1 eosio.token transfer \'{"from": "eosio", "to": "battlefield1", "quantity": "1.0000 SYS", "memo":"push delayed trx"}\' -p eosio')
+    sleep(1.1)
+
+    # This is to see how the RAM_USAGE behaves, when a deferred hard_fails. Does it refund the deferred_trx_remove ? What about the other RAM tweaks? Any one them saved?
+    retry(getCleos() + 'push action battlefield1 dbinstwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
+    print('\n')
+
+    sleep(0.6)
+    retry(getCleos() + 'push action battlefield1 dbremtwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
+    # Create a delayed and cancel it (in same block) with \'eosio:canceldelay\''
+    retry(getCleos() + 'push action --delay-sec=3600 battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1 --json-file /tmp/delayed.json')
+    with open('/tmp/delayed.json', 'r') as file:
+        data = json.load(file)
+    retry(getCleos() + 'system canceldelay battlefield1 active ' + data["transaction_id"])
+    retry('rm /tmp/delayed.json || true')
+    sleep(0.6)
+
+    # Create a delayed and cancel it (in the next block) with \'eosio:canceldelay\''
+    retry(getCleos() + 'push action --delay-sec=3600 battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1 --json-file /tmp/delayed.json')
+    with open('/tmp/delayed.json', 'r') as file:
+        data = json.load(file)
+    sleep(1.1)
+    retry(getCleos() + 'system canceldelay battlefield1 active ' + data["transaction_id"])
+    retry('rm /tmp/delayed.json || true')
+    sleep(0.6)
+
+    print('\nCreate auth structs, updateauth to create, updateauth to modify, deleteauth to test AUTH_OPs')
+    # random key
+    retry(getCleos() + 'set account permission battlefield2 ops EOS7f5watu1cLgth3ub1uAnsGkHq1F6PhauScBg6rJGUfe79MgG9Y active')
+    sleep(0.6)
+    # back to safe key
+    retry(getCleos() + 'set account permission battlefield2 ops EOS5MHPYyhjBjnQZejzZHqHewPWhGTfQWSVTWYEhDmJu4SXkzgweP')
+    sleep(0.6)
+
+    retry(getCleos() + 'set action permission battlefield2 eosio.token transfer ops')
+    sleep(0.6)
+
+    retry(getCleos() + 'set action permission battlefield2 eosio.token transfer NULL')
+    sleep(0.6)
+
+    retry(getCleos() + 'set account permission battlefield2 ops NULL')
+    sleep(0.6)
+
+    print("\nCreate a creational order different than the execution order")
+    ## We use the --force-unique flag so a context-free action exist in the transactions traces tree prior our own,
+    ## creating a multi-root execution traces tree.
+    retry(getCleos() + 'push action --force-unique battlefield1 creaorder \'{"n1": "notified1", "n2": "notified2", "n3": "notified3", "n4": "notified4", "n5": "notified5"}\' -p battlefield1')
+    sleep(0.6)
+
+    ## Series of test for variant support
+    retry(getCleos() + 'push action battlefield1 varianttest \'{"value":["uint16",12]}\' -p battlefield1')
+    retry(getCleos() + 'push action battlefield1 varianttest \'{"value":["string","this is a long value"]}\' -p battlefield1')
+    sleep(0.6)
+
+    ## Series of test for secondary keys
+    retry(getCleos() + 'push action battlefield1 sktest \'{"action":"insert"}\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 sktest \'{"action":"update.sk"}\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 sktest \'{"action":"update.ot"}\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 sktest \'{"action":"remove"}\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 retvalue \'{"n":100}\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 binexttest \'[bintest]\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 binexttest \'[]\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 optiontest \'[opti]\' -p battlefield1')
+    sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 optiontest \'[null]\' -p battlefield1')
+    sleep(0.6)
+
 def stepInitSystemContract():
     stepTitle()
     run(getCleos() + 'push action eosio init' + jsonArg(['0', '4,' + args.symbol]) + '-p eosio@active')
@@ -510,8 +647,8 @@ commands = [
     ('t', 'tokens',             stepCreateTokens,           True,    "Create tokens"),
     ('S', 'sys-contract',       stepSetSystemContract,      True,    "Set system contract"),
     ('I', 'init-sys-contract',  stepInitSystemContract,     True,    "Initialiaze system contract"),
+    ('T', 'stake',              stepCreateStakedAccounts,   True,    "Create staked accounts"),
     ('f', 'battlefield',        stepBattlefield,            True,    "Run battlefield tests"),
-    # ('T', 'stake',              stepCreateStakedAccounts,   True,    "Create staked accounts"),
     # ('p', 'reg-prod',           stepRegProducers,           True,    "Register producers"),
     # ('P', 'start-prod',         stepStartProducers,         True,    "Start producers"),
     # ('v', 'vote',               stepVote,                   True,    "Vote for producers"),

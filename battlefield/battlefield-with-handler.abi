@@ -301,6 +301,16 @@
             ]
         },
         {
+            "name": "retvalue",
+            "base": "",
+            "fields": [
+                {
+                    "name": "n",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "sk_row",
             "base": "",
             "fields": [
@@ -452,6 +462,11 @@
         {
             "name": "producerows",
             "type": "producerows",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "retvalue",
+            "type": "retvalue",
             "ricardian_contract": ""
         },
         {

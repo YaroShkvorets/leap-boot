@@ -76,9 +76,7 @@ public:
 
     [[eosio::action]] void sktest(name action);
 
-#if WITH_RETURN_VALUE == 1
     [[eosio::action]] uint32_t retvalue(uint32_t n);
-#endif
 
 #if WITH_ONERROR_HANDLER == 1
     [[eosio::on_notify("eosio::onerror")]] void onerror(eosio::onerror data);

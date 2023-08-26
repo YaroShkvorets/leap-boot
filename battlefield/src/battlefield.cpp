@@ -540,10 +540,8 @@ void battlefield::sktest(name action)
     }
 }
 
-#if WITH_RETURN_VALUE==1
 uint32_t battlefield::retvalue(uint32_t n)
 {
     // const auto hash = eosio::get_code_hash(_self);
     return n + 1;
 }
-#endif
