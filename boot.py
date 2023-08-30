@@ -11,6 +11,8 @@ import sys
 import time
 import inspect
 
+from log import initLogging, logAction, logDbop
+
 args = None
 logFile = None
 
@@ -638,6 +640,11 @@ def stepKillall():
     stepTitle()
     run('killall nodeos keosd || true')
     sleep(1)
+    
+initLogging('sample4.log')
+
+logAction('eosio.token', 'account', 'transfer', {"from": "me", "to": "them", "quantity": "10.0000 EOS", "memo": "enjoy some tokens!"})
+logDbop('eosio.token', 'eosio.token', 'stat', {'balance': '123.0000 EOS'})
 
 # Command Line Arguments
 
