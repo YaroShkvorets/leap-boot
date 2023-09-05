@@ -423,6 +423,7 @@ def stepBattlefield():
     stepTitle()
 
     retry(getCleos() + 'set account permission battlefield1 active --add-code')
+    logAction('eosio', 'eosio', 'updateauth', { 'account': 'battlefield1', 'auth': '*', 'parent': 'owner', 'permission': 'active' })
     retry(getCleos() + 'set account permission battlefield2 active --add-code')
     retry(getCleos() + 'set account permission battlefield3 active --add-code')
     retry(getCleos() + 'set account permission battlefield4 active --add-code')
@@ -450,26 +451,44 @@ def stepBattlefield():
     
     print('\nSetting contracts')
     retry(getCleos() + 'system buyram eosio battlefield1 --kbytes 20000')
+    logAction('eosio', 'eosio', 'buyrambytes', { 'bytes': 20480000, 'payer': 'eosio', 'receiver': 'battlefield1' })
+    logDbop('eosio', 'battlefield1', 'userres', 10, 'UPD', { 'cpu_weight': '*', 'net_weight': '*', 'owner': 'battlefield1', 'ram_bytes': '*'})
     retry(getCleos() + 'system buyram eosio battlefield3 --kbytes 1000')
+    logAction('eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'battlefield3' })
     retry(getCleos() + 'system buyram eosio notified2 --kbytes 1000')
+    logAction('eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'notified2' })
     sleep(0.6)
     
     retry(getCleos() + 'set contract battlefield1 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
+    logAction('eosio', 'eosio', 'setcode', { 'account': 'battlefield1', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
     retry(getCleos() + 'set contract battlefield3 ./battlefield battlefield-with-handler.wasm battlefield-with-handler.abi')
+    logAction('eosio', 'eosio', 'setcode', { 'account': 'battlefield3', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
     retry(getCleos() + 'set contract notified2 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
+    logAction('eosio', 'eosio', 'setcode', { 'account': 'notified2', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dbins', { 'account': 'battlefield1' })
+    logDbop('battlefield1', 'battlefield1', 'member', 1, 'INS', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "inserted billed to calling account"})
+    logDbop('battlefield1', 'battlefield1', 'member', 2, 'INS', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "inserted billed to self"})
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 dbupd \'{"account": "battlefield2"}\' -p battlefield2')
+    logAction('battlefield1', 'battlefield1', 'dbupd', { 'account': 'battlefield2' })
+    logDbop('battlefield1', 'battlefield1', 'member', 1, 'UPD', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "updated row 1"})
+    logDbop('battlefield1', 'battlefield1', 'member', 2, 'UPD', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "updated row 2"})
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 dbrem \'{"account": "battlefield1"}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dbrem', { 'account': 'battlefield1' })
+    logDbop('battlefield1', 'battlefield1', 'member', 1, 'REM', {})
+    logDbop('battlefield1', 'battlefield1', 'member', 2, 'REM', {})
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
     retry(getCleos() + 'push action battlefield1 dtrxcancel \'{"account": "battlefield1"}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dtrxcancel', { 'account': 'battlefield1' })
     sleep(0.6)
 
     background(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": true, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
@@ -478,47 +497,76 @@ def stepBattlefield():
 
     # `send_deferred` with `replace_existing` enabled, to test `MODIFY` clauses.
     retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
     retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "2"}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "2" })
+    logAction('battlefield1', 'battlefield1', 'dtrxexec', { "account": "battlefield1", "fail": 0, "failNested": 0, "nonce": "2" })
+    logAction('battlefield1', 'battlefield1', 'nestdtrxexec', { "fail": 0 })
     sleep (0.6)
 
     retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 1, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
     print('\nWaiting for the transaction to fail (no onerror handler)...')
     sleep(1.1)
 
     retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": true, "delay_sec": 1, "nonce": "2"}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 1, "fail_now": 0, "nonce": "2" })
     print('\nWaiting for the transaction to fail (no onerror handler)...')
     sleep(1.1)
 
     retry(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield3')
+    logAction('battlefield3', 'battlefield3', 'dtrx', { "account": "battlefield3", "delay_sec": 1, "fail_later": 1, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
+    # soft error
+    logAction('eosio', 'battlefield3', 'onerror', { 'sender_id': '*', 'sent_trx': '*' })
     print('\nWaiting for the transaction to fail (with onerror handler that succeed)...')
     sleep(1.1)
 
     retry(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "f"}\' -p battlefield3')
+    logAction('battlefield3', 'battlefield3', 'dtrx', { "account": "battlefield3", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 1, "fail_now": 0, "nonce": "2" })
+    # soft error
+    logAction('eosio', 'battlefield3', 'onerror', { 'sender_id': '*', 'sent_trx': '*' })
     print('\nWaiting for the transaction to fail (with onerror handler that failed)...')
     sleep(1.1)
 
     retry(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "nf"}\' -p battlefield3')
+    logAction('battlefield3', 'battlefield3', 'dtrx', { "account": "battlefield3", "delay_sec": 1, "fail_later": 1, "fail_later_nested": 0, "fail_now": 0, "nonce": "nf" })
     print('\nWaiting for the transaction to fail (with onerror handler that failed inside a nested action)...')
     sleep(1.1)
 
     retry(getCleos() + 'push action battlefield1 dbinstwo \'{"account": "battlefield1", "first": 100, "second": 101}\' -p battlefield1')
+    # ?????
     # This TX will do one DB_OPERATION for writing, and the second will fail. We want our instrumentation NOT to keep that DB_OPERATION.
+    logAction('battlefield1', 'battlefield1', 'dbinstwo', { 'account': 'battlefield1', 'first': 100, 'second': 101 })
+    logDbop('battlefield1', 'battlefield1', 'member', 100, 'INS', { "account": "...........a4", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
+    logDbop('battlefield1', 'battlefield1', 'member', 101, 'INS', { "account": "...........a5", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
+    
 
     retry(getCleos() + 'push action --delay-sec=1 battlefield1 dbinstwo \'{"account": "battlefield1", "first": 102, "second": 100}\' -p battlefield1')
+    # this one fails, nothing on chain
     print('\nWaiting for the transaction to fail, yet attempt to write to storage')
     sleep(1.1)
 
     retry(getCleos() + 'push action battlefield1 dbremtwo \'{"account": "battlefield1", "first": 100, "second": 101}\' -p battlefield1')
     # This TX will show a delay transaction (deferred) that succeeds
     retry(getCleos() + 'push action --delay-sec=1 eosio.token transfer \'{"from": "eosio", "to": "battlefield1", "quantity": "1.0000 SYS", "memo":"push delayed trx"}\' -p eosio')
+    logAction('battlefield1', 'battlefield1', 'dbremtwo', { 'account': 'battlefield1', 'first': 100, 'second': 101 })
+    logDbop('battlefield1', 'battlefield1', 'member', 100, 'REM', {})
+    logDbop('battlefield1', 'battlefield1', 'member', 101, 'REM', {})
     sleep(1.1)
 
     # This is to see how the RAM_USAGE behaves, when a deferred hard_fails. Does it refund the deferred_trx_remove ? What about the other RAM tweaks? Any one them saved?
     retry(getCleos() + 'push action battlefield1 dbinstwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dbinstwo', { 'account': 'battlefield1', 'first': 200, 'second': 201 })
+    logDbop('battlefield1', 'battlefield1', 'member', 200, 'INS', { "account": "...........gc", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
+    logDbop('battlefield1', 'battlefield1', 'member', 201, 'INS', { "account": "...........gd", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
     print('\n')
 
     sleep(0.6)
     retry(getCleos() + 'push action battlefield1 dbremtwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dbremtwo', { 'account': 'battlefield1', 'first': 200, 'second': 201 })
+    logDbop('battlefield1', 'battlefield1', 'member', 200, 'REM', {})
+    logDbop('battlefield1', 'battlefield1', 'member', 201, 'REM', {})
+
     # Create a delayed and cancel it (in same block) with \'eosio:canceldelay\''
     retry(getCleos() + 'push action --delay-sec=3600 battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1 --json-file /tmp/delayed.json')
     with open('/tmp/delayed.json', 'r') as file:
@@ -539,24 +587,30 @@ def stepBattlefield():
     print('\nCreate auth structs, updateauth to create, updateauth to modify, deleteauth to test AUTH_OPs')
     # random key
     retry(getCleos() + 'set account permission battlefield2 ops EOS7f5watu1cLgth3ub1uAnsGkHq1F6PhauScBg6rJGUfe79MgG9Y active')
+    logAction('eosio', 'eosio', 'updateauth', { 'account': 'battlefield1', 'auth': '*', 'parent': 'active', 'permission': 'ops' })
     sleep(0.6)
     # back to safe key
     retry(getCleos() + 'set account permission battlefield2 ops EOS5MHPYyhjBjnQZejzZHqHewPWhGTfQWSVTWYEhDmJu4SXkzgweP')
+    logAction('eosio', 'eosio', 'updateauth', { 'account': 'battlefield1', 'auth': '*', 'parent': 'active', 'permission': 'ops' })
     sleep(0.6)
 
     retry(getCleos() + 'set action permission battlefield2 eosio.token transfer ops')
+    logAction('eosio', 'eosio', 'linkauth', { 'account': 'battlefield1', 'code': 'eosio.token', 'requirement': 'ops', 'type': 'transfer' })
     sleep(0.6)
 
     retry(getCleos() + 'set action permission battlefield2 eosio.token transfer NULL')
+    logAction('eosio', 'eosio', 'unlinkauth', { 'account': 'battlefield1', 'code': 'eosio.token', 'type': 'transfer' })
     sleep(0.6)
 
     retry(getCleos() + 'set account permission battlefield2 ops NULL')
+    logAction('eosio', 'eosio', 'deleteauth', { 'account': 'battlefield1', 'permission': 'ops' })
     sleep(0.6)
 
     print("\nCreate a creational order different than the execution order")
     ## We use the --force-unique flag so a context-free action exist in the transactions traces tree prior our own,
     ## creating a multi-root execution traces tree.
     retry(getCleos() + 'push action --force-unique battlefield1 creaorder \'{"n1": "notified1", "n2": "notified2", "n3": "notified3", "n4": "notified4", "n5": "notified5"}\' -p battlefield1')
+    # TODO
     sleep(0.6)
 
     ## Series of test for variant support
@@ -641,11 +695,6 @@ def stepKillall():
     run('killall nodeos keosd || true')
     sleep(1)
     
-initLogging('sample4.log')
-
-logAction('eosio.token', 'account', 'transfer', {"from": "me", "to": "them", "quantity": "10.0000 EOS", "memo": "enjoy some tokens!"})
-logDbop('eosio.token', 'eosio.token', 'stat', {'balance': '123.0000 EOS'})
-
 # Command Line Arguments
 
 parser = argparse.ArgumentParser()
@@ -684,6 +733,7 @@ parser.add_argument('--nodes-dir', metavar='', help="Path to nodes directory", d
 parser.add_argument('--genesis', metavar='', help="Path to genesis.json", default="./genesis.json")
 parser.add_argument('--wallet-dir', metavar='', help="Path to wallet directory", default='./wallet/')
 parser.add_argument('--log-path', metavar='', help="Path to log file", default='./output.log')
+parser.add_argument('--actionlog-path', metavar='', help="Path to action log file", default='./actions.log')
 parser.add_argument('--dmlog-path', metavar='', help="Path to deepmind log file", default='./dm.log')
 parser.add_argument('--symbol', metavar='', help="The eosio.system symbol", default='SYS')
 parser.add_argument('--user-limit', metavar='', help="Max number of users. (0 = no limit)", type=int, default=3000)
@@ -710,6 +760,8 @@ for (flag, command, function, inAll, help) in commands:
         parser.add_argument('--' + command, action='store_true', help=help, dest=command)
 
 args = parser.parse_args()
+
+initLogging(args.actionlog_path)
 
 # Leave a space in front of --url in case the user types cleos alone
 # args.cleos += ' --url http://127.0.0.1:%d ' % args.http_port

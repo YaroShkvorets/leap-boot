@@ -6,7 +6,7 @@ class JsonFormatter(logging.Formatter):
     def format(self, record):
 
         json_record = {
-            "level": record.levelname,
+            # "level": record.levelname,
             "timestamp": self.formatTime(record, self.datefmt),
             "type": record.msg,
         }
@@ -26,7 +26,7 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(json_record)
     
 def initLogging(filename):
-    handler = logging.FileHandler(filename)
+    handler = logging.FileHandler(filename, mode='w')
     handler.setFormatter(JsonFormatter())
     logging.getLogger().addHandler(handler)
     logging.getLogger().setLevel(logging.INFO)
@@ -35,6 +35,8 @@ def initLogging(filename):
 def logAction(account, receiver, action_name, params):
     logging.info("action", extra={"action_name": action_name, "account": account, "receiver": receiver, "params": params})
     
-def logDbop(code, scope, table_name, fields):
-    logging.info("dbop", extra={"code": code, "scope": scope, "table_name": table_name, "fields": fields})
+def logDbop(code, scope, table_name, pkey, op, fields):
+    if op not in ['INS', 'UPD', 'REM']:
+        raise ValueError(f"Invalid operation: {op}. Operation must be one of 'INS', 'UPD', or 'REM'")
+    logging.info("dbop", extra={"code": code, "scope": scope, "table_name": table_name, "pkey": pkey, "op": op, "fields": fields})
 
