@@ -467,6 +467,11 @@ def stepBattlefield():
     logAction('eosio', 'eosio', 'setcode', { 'account': 'notified2', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
     sleep(0.6)
 
+    retry(getCleos() + 'push action battlefield1 prims \'{"boolvar": true, "namevar": "battlefield1", "stringvar": "some string", "int8var": -1, "uint8var": 2, "int16var": -3, "uint16var": 4, "int32var": -5, "uint32var": 6, "int64var": -7, "uint64var": 8}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'dbins', { 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
+    logDbop('battlefield1', 'battlefield1', 'primitives', 1, 'INS', { 'id': 1, 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
+    sleep(0.6)
+
     retry(getCleos() + 'push action battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1')
     logAction('battlefield1', 'battlefield1', 'dbins', { 'account': 'battlefield1' })
     logDbop('battlefield1', 'battlefield1', 'member', 1, 'INS', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "inserted billed to calling account"})

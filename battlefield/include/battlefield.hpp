@@ -78,6 +78,8 @@ public:
 
     [[eosio::action]] uint32_t retvalue(uint32_t n);
 
+    [[eosio::action]] void prims(bool boolvar, name namevar, string stringvar, int8_t int8var, uint8_t uint8var, int16_t int16var, uint16_t uint16var, int32_t int32var, uint32_t uint32var, int64_t int64var, uint64_t uint64var);
+
 #if WITH_ONERROR_HANDLER == 1
     [[eosio::on_notify("eosio::onerror")]] void onerror(eosio::onerror data);
 #endif
@@ -256,4 +258,23 @@ private:
                                indexed_by<"c.3"_n, const_mem_fun<sk_row, checksum256, &sk_row::by_c256>>,
                                indexed_by<"i.4"_n, const_mem_fun<sk_row, uint64_t, &sk_row::by_i64>>>
         sk_multi;
+    
+    struct [[eosio::table]] primitives_row
+    {
+        uint64_t id;
+        bool boolvar;
+        name namevar;
+        string stringvar;
+        int8_t int8var;
+        uint8_t uint8var;
+        int16_t int16var;
+        uint16_t uint16var;
+        int32_t int32var;
+        uint32_t uint32var;
+        int64_t int64var;
+        uint64_t uint64var;
+
+        auto primary_key() const { return id; }
+    };
+    typedef eosio::multi_index< "primitives"_n, primitives_row> primitives;
 };

@@ -545,3 +545,23 @@ uint32_t battlefield::retvalue(uint32_t n)
     // const auto hash = eosio::get_code_hash(_self);
     return n + 1;
 }
+
+void battlefield::prims(bool boolvar, name namevar, string stringvar, int8_t int8var, uint8_t uint8var, int16_t int16var, uint16_t uint16var, int32_t int32var, uint32_t uint32var, int64_t int64var, uint64_t uint64var )
+{
+    primitives primitives_table(_self, _self.value);
+    primitives_table.emplace(_self, [&](auto &row) {
+        row.id = primitives_table.available_primary_key();
+        row.boolvar = boolvar;
+        row.namevar = namevar;
+        row.stringvar = stringvar;
+        row.int8var = int8var;
+        row.uint8var = uint8var;
+        row.int16var = int16var;
+        row.uint16var = uint16var;
+        row.int32var = int32var;
+        row.uint32var = uint32var;
+        row.int64var = int64var;
+        row.uint64var = uint64var;
+    });
+
+}

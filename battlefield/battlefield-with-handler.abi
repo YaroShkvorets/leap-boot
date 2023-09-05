@@ -291,6 +291,110 @@
             ]
         },
         {
+            "name": "primitives_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "boolvar",
+                    "type": "bool"
+                },
+                {
+                    "name": "namevar",
+                    "type": "name"
+                },
+                {
+                    "name": "stringvar",
+                    "type": "string"
+                },
+                {
+                    "name": "int8var",
+                    "type": "int8"
+                },
+                {
+                    "name": "uint8var",
+                    "type": "uint8"
+                },
+                {
+                    "name": "int16var",
+                    "type": "int16"
+                },
+                {
+                    "name": "uint16var",
+                    "type": "uint16"
+                },
+                {
+                    "name": "int32var",
+                    "type": "int32"
+                },
+                {
+                    "name": "uint32var",
+                    "type": "uint32"
+                },
+                {
+                    "name": "int64var",
+                    "type": "int64"
+                },
+                {
+                    "name": "uint64var",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "prims",
+            "base": "",
+            "fields": [
+                {
+                    "name": "boolvar",
+                    "type": "bool"
+                },
+                {
+                    "name": "namevar",
+                    "type": "name"
+                },
+                {
+                    "name": "stringvar",
+                    "type": "string"
+                },
+                {
+                    "name": "int8var",
+                    "type": "int8"
+                },
+                {
+                    "name": "uint8var",
+                    "type": "uint8"
+                },
+                {
+                    "name": "int16var",
+                    "type": "int16"
+                },
+                {
+                    "name": "uint16var",
+                    "type": "uint16"
+                },
+                {
+                    "name": "int32var",
+                    "type": "int32"
+                },
+                {
+                    "name": "uint32var",
+                    "type": "uint32"
+                },
+                {
+                    "name": "int64var",
+                    "type": "int64"
+                },
+                {
+                    "name": "uint64var",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "producerows",
             "base": "",
             "fields": [
@@ -460,6 +564,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "prims",
+            "type": "prims",
+            "ricardian_contract": ""
+        },
+        {
             "name": "producerows",
             "type": "producerows",
             "ricardian_contract": ""
@@ -491,6 +600,13 @@
         {
             "name": "member",
             "type": "member_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "primitives",
+            "type": "primitives_row",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
