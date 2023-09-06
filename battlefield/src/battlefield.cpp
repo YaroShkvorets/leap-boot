@@ -546,7 +546,7 @@ uint32_t battlefield::retvalue(uint32_t n)
     return n + 1;
 }
 
-void battlefield::prims(bool boolvar, name namevar, string stringvar, int8_t int8var, uint8_t uint8var, int16_t int16var, uint16_t uint16var, int32_t int32var, uint32_t uint32var, int64_t int64var, uint64_t uint64var )
+void battlefield::prims(bool boolvar, name namevar, string stringvar, int8_t int8var, uint8_t uint8var, int16_t int16var, uint16_t uint16var, int32_t int32var, uint32_t uint32var, int64_t int64var, uint64_t uint64var, double_t doublevar, float_t floatvar )
 {
     primitives primitives_table(_self, _self.value);
     primitives_table.emplace(_self, [&](auto &row) {
@@ -562,6 +562,8 @@ void battlefield::prims(bool boolvar, name namevar, string stringvar, int8_t int
         row.uint32var = uint32var;
         row.int64var = int64var;
         row.uint64var = uint64var;
+        row.doublevar = doublevar;
+        row.floatvar = floatvar;
     });
 
 }

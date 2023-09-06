@@ -3,6 +3,14 @@
     "version": "eosio::abi/1.2",
     "types": [
         {
+            "new_type_name": "double_t",
+            "type": "float64"
+        },
+        {
+            "new_type_name": "float_t",
+            "type": "float32"
+        },
+        {
             "new_type_name": "varying_action",
             "type": "variant_uint16_string"
         }
@@ -449,6 +457,14 @@
                 {
                     "name": "uint64var",
                     "type": "uint64"
+                },
+                {
+                    "name": "doublevar",
+                    "type": "double_t"
+                },
+                {
+                    "name": "floatvar",
+                    "type": "float_t"
                 }
             ]
         },
@@ -499,6 +515,14 @@
                 {
                     "name": "uint64var",
                     "type": "uint64"
+                },
+                {
+                    "name": "doublevar",
+                    "type": "double_t"
+                },
+                {
+                    "name": "floatvar",
+                    "type": "float_t"
                 }
             ]
         },

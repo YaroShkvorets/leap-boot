@@ -467,9 +467,9 @@ def stepBattlefield():
     logAction('eosio', 'eosio', 'setcode', { 'account': 'notified2', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
     sleep(0.6)
 
-    retry(getCleos() + 'push action battlefield1 prims \'{"boolvar": true, "namevar": "battlefield1", "stringvar": "some string", "int8var": -1, "uint8var": 2, "int16var": -3, "uint16var": 4, "int32var": -5, "uint32var": 6, "int64var": -7, "uint64var": 8}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'prims', { 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
-    logDbop('battlefield1', 'battlefield1', 'primitives', '............1', 'INS', { 'id': 1, 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
+    retry(getCleos() + 'push action battlefield1 prims \'{"boolvar": true, "namevar": "battlefield1", "stringvar": "some string", "int8var": -1, "uint8var": 2, "int16var": -3, "uint16var": 4, "int32var": -5, "uint32var": 6, "int64var": -7, "uint64var": 8, "doublevar": 9.123456789, "floatvar": 10.12345}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'prims', { 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8, 'doublevar': '9.12345678900000046', 'floatvar': '10.12345027923583984' })
+    logDbop('battlefield1', 'battlefield1', 'primitives', '............1', 'INS', { 'id': 1, 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8, 'doublevar': 9.123456789, 'floatvar': 10.12345027923584 })
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 bltins \'{"symcodevar": "EOS", "assetvar": "1.0000 EOS", "symbolvar": "4,EOS", "extsymvar": {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05"}\' -p battlefield1')
