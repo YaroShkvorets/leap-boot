@@ -47,7 +47,7 @@ func init() {
 func main() {
 
 	// to generate an expected.json file from the dmlog
-	// generateExpected("dm.log", "expected.json")
+	// generateExpected("dm.log", "dm.log.json")
 	// return
 
 	ensure(len(os.Args) == 2, "Single argument must be <chain> to compare")
@@ -412,8 +412,8 @@ func generateExpected(dmlogFile, expectedJsonFile string) {
 
 	writeActualBlocks(expectedJsonFile, actualBlocks)
 
-	err := compressFile(expectedJsonFile)
-	noError(err, "Unable to compress file %q", expectedJsonFile)
+	// err := compressFile(expectedJsonFile)
+	// noError(err, "Unable to compress file %q", expectedJsonFile)
 }
 
 func blockReaderFactory(reader io.Reader) (bstream.BlockReader, error) {
