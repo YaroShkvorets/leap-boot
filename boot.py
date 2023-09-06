@@ -469,31 +469,31 @@ def stepBattlefield():
 
     retry(getCleos() + 'push action battlefield1 prims \'{"boolvar": true, "namevar": "battlefield1", "stringvar": "some string", "int8var": -1, "uint8var": 2, "int16var": -3, "uint16var": 4, "int32var": -5, "uint32var": 6, "int64var": -7, "uint64var": 8}\' -p battlefield1')
     logAction('battlefield1', 'battlefield1', 'prims', { 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
-    logDbop('battlefield1', 'battlefield1', 'primitives', 0, 'INS', { 'id': 0, 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
+    logDbop('battlefield1', 'battlefield1', 'primitives', '............1', 'INS', { 'id': 1, 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 bltins \'{"symcodevar": "EOS", "assetvar": "1.0000 EOS", "symbolvar": "4,EOS", "extsymvar": {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05"}\' -p battlefield1')
     logAction('battlefield1', 'battlefield1', 'bltins', { 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
-    logDbop('battlefield1', 'battlefield1', 'bltins', 0, 'INS', { 'id': 0, 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
+    logDbop('battlefield1', 'battlefield1', 'bltins', '............1', 'INS', { 'id': 1, 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
     sleep(0.6)
 
 
     retry(getCleos() + 'push action battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1')
     logAction('battlefield1', 'battlefield1', 'dbins', { 'account': 'battlefield1' })
-    logDbop('battlefield1', 'battlefield1', 'member', 1, 'INS', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "inserted billed to calling account"})
-    logDbop('battlefield1', 'battlefield1', 'member', 2, 'INS', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "inserted billed to self"})
+    logDbop('battlefield1', 'battlefield1', 'member', '............1', 'INS', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "inserted billed to calling account"})
+    logDbop('battlefield1', 'battlefield1', 'member', '............2', 'INS', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "inserted billed to self"})
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 dbupd \'{"account": "battlefield2"}\' -p battlefield2')
     logAction('battlefield1', 'battlefield1', 'dbupd', { 'account': 'battlefield2' })
-    logDbop('battlefield1', 'battlefield1', 'member', 1, 'UPD', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "updated row 1"})
-    logDbop('battlefield1', 'battlefield1', 'member', 2, 'UPD', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "updated row 2"})
+    logDbop('battlefield1', 'battlefield1', 'member', '............1', 'UPD', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "updated row 1"})
+    logDbop('battlefield1', 'battlefield1', 'member', '............2', 'UPD', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "updated row 2"})
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 dbrem \'{"account": "battlefield1"}\' -p battlefield1')
     logAction('battlefield1', 'battlefield1', 'dbrem', { 'account': 'battlefield1' })
-    logDbop('battlefield1', 'battlefield1', 'member', 1, 'REM', {})
-    logDbop('battlefield1', 'battlefield1', 'member', 2, 'REM', {})
+    logDbop('battlefield1', 'battlefield1', 'member', '............1', 'REM', {})
+    logDbop('battlefield1', 'battlefield1', 'member', '............2', 'REM', {})
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
@@ -548,8 +548,8 @@ def stepBattlefield():
     # ?????
     # This TX will do one DB_OPERATION for writing, and the second will fail. We want our instrumentation NOT to keep that DB_OPERATION.
     logAction('battlefield1', 'battlefield1', 'dbinstwo', { 'account': 'battlefield1', 'first': 100, 'second': 101 })
-    logDbop('battlefield1', 'battlefield1', 'member', 100, 'INS', { "account": "...........a4", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
-    logDbop('battlefield1', 'battlefield1', 'member', 101, 'INS', { "account": "...........a5", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
+    logDbop('battlefield1', 'battlefield1', 'member', '...........a4', 'INS', { "account": "...........a4", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
+    logDbop('battlefield1', 'battlefield1', 'member', '...........a5', 'INS', { "account": "...........a5", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
     
 
     retry(getCleos() + 'push action --delay-sec=1 battlefield1 dbinstwo \'{"account": "battlefield1", "first": 102, "second": 100}\' -p battlefield1')
@@ -561,22 +561,22 @@ def stepBattlefield():
     # This TX will show a delay transaction (deferred) that succeeds
     retry(getCleos() + 'push action --delay-sec=1 eosio.token transfer \'{"from": "eosio", "to": "battlefield1", "quantity": "1.0000 SYS", "memo":"push delayed trx"}\' -p eosio')
     logAction('battlefield1', 'battlefield1', 'dbremtwo', { 'account': 'battlefield1', 'first': 100, 'second': 101 })
-    logDbop('battlefield1', 'battlefield1', 'member', 100, 'REM', {})
-    logDbop('battlefield1', 'battlefield1', 'member', 101, 'REM', {})
+    logDbop('battlefield1', 'battlefield1', 'member', '...........a4', 'REM', {})
+    logDbop('battlefield1', 'battlefield1', 'member', '...........a5', 'REM', {})
     sleep(1.1)
 
     # This is to see how the RAM_USAGE behaves, when a deferred hard_fails. Does it refund the deferred_trx_remove ? What about the other RAM tweaks? Any one them saved?
     retry(getCleos() + 'push action battlefield1 dbinstwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
     logAction('battlefield1', 'battlefield1', 'dbinstwo', { 'account': 'battlefield1', 'first': 200, 'second': 201 })
-    logDbop('battlefield1', 'battlefield1', 'member', 200, 'INS', { "account": "...........gc", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
-    logDbop('battlefield1', 'battlefield1', 'member', 201, 'INS', { "account": "...........gd", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
+    logDbop('battlefield1', 'battlefield1', 'member', '...........gc', 'INS', { "account": "...........gc", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
+    logDbop('battlefield1', 'battlefield1', 'member', '...........gd', 'INS', { "account": "...........gd", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
     print('\n')
 
     sleep(0.6)
     retry(getCleos() + 'push action battlefield1 dbremtwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
     logAction('battlefield1', 'battlefield1', 'dbremtwo', { 'account': 'battlefield1', 'first': 200, 'second': 201 })
-    logDbop('battlefield1', 'battlefield1', 'member', 200, 'REM', {})
-    logDbop('battlefield1', 'battlefield1', 'member', 201, 'REM', {})
+    logDbop('battlefield1', 'battlefield1', 'member', '...........gc', 'REM', {})
+    logDbop('battlefield1', 'battlefield1', 'member', '...........gd', 'REM', {})
 
     # Create a delayed and cancel it (in same block) with \'eosio:canceldelay\''
     retry(getCleos() + 'push action --delay-sec=3600 battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1 --json-file /tmp/delayed.json')
