@@ -33,6 +33,86 @@
             ]
         },
         {
+            "name": "bltins",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symcodevar",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "assetvar",
+                    "type": "asset"
+                },
+                {
+                    "name": "symbolvar",
+                    "type": "symbol"
+                },
+                {
+                    "name": "extsymvar",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "extassetvar",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "vecvar",
+                    "type": "name[]"
+                },
+                {
+                    "name": "mapvar",
+                    "type": "pair_name_string[]"
+                },
+                {
+                    "name": "timevar",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "builtins_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "symcodevar",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "assetvar",
+                    "type": "asset"
+                },
+                {
+                    "name": "symbolvar",
+                    "type": "symbol"
+                },
+                {
+                    "name": "extsymvar",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "extassetvar",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "vecvar",
+                    "type": "name[]"
+                },
+                {
+                    "name": "mapvar",
+                    "type": "pair_name_string[]"
+                },
+                {
+                    "name": "timevar",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
             "name": "creaorder",
             "base": "",
             "fields": [
@@ -187,6 +267,20 @@
             ]
         },
         {
+            "name": "extended_symbol",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "inlinedeep",
             "base": "",
             "fields": [
@@ -287,6 +381,20 @@
                 {
                     "name": "opt_param",
                     "type": "name?"
+                }
+            ]
+        },
+        {
+            "name": "pair_name_string",
+            "base": "",
+            "fields": [
+                {
+                    "name": "first",
+                    "type": "name"
+                },
+                {
+                    "name": "second",
+                    "type": "string"
                 }
             ]
         },
@@ -494,6 +602,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "bltins",
+            "type": "bltins",
+            "ricardian_contract": ""
+        },
+        {
             "name": "creaorder",
             "type": "creaorder",
             "ricardian_contract": ""
@@ -593,6 +706,13 @@
         {
             "name": "binaryext",
             "type": "binaryext_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "builtins",
+            "type": "builtins_row",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

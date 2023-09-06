@@ -468,9 +468,15 @@ def stepBattlefield():
     sleep(0.6)
 
     retry(getCleos() + 'push action battlefield1 prims \'{"boolvar": true, "namevar": "battlefield1", "stringvar": "some string", "int8var": -1, "uint8var": 2, "int16var": -3, "uint16var": 4, "int32var": -5, "uint32var": 6, "int64var": -7, "uint64var": 8}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dbins', { 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
-    logDbop('battlefield1', 'battlefield1', 'primitives', 1, 'INS', { 'id': 0, 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
+    logAction('battlefield1', 'battlefield1', 'prims', { 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
+    logDbop('battlefield1', 'battlefield1', 'primitives', 0, 'INS', { 'id': 0, 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8 })
     sleep(0.6)
+
+    retry(getCleos() + 'push action battlefield1 bltins \'{"symcodevar": "EOS", "assetvar": "1.0000 EOS", "symbolvar": "4,EOS", "extsymvar": {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05"}\' -p battlefield1')
+    logAction('battlefield1', 'battlefield1', 'bltins', { 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
+    logDbop('battlefield1', 'battlefield1', 'bltins', 0, 'INS', { 'id': 0, 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
+    sleep(0.6)
+
 
     retry(getCleos() + 'push action battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1')
     logAction('battlefield1', 'battlefield1', 'dbins', { 'account': 'battlefield1' })

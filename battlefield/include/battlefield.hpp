@@ -32,9 +32,15 @@ using eosio::permission_level;
 using eosio::print;
 using eosio::time_point_sec;
 using eosio::binary_extension;
+using eosio::symbol_code;
+using eosio::symbol;
+using eosio::extended_asset;
+using eosio::extended_symbol;
 using std::function;
 using std::string;
 using std::optional;
+using std::vector;
+using std::map;
 
 class [[eosio::contract("battlefield")]] battlefield : public contract
 {
@@ -79,6 +85,8 @@ public:
     [[eosio::action]] uint32_t retvalue(uint32_t n);
 
     [[eosio::action]] void prims(bool boolvar, name namevar, string stringvar, int8_t int8var, uint8_t uint8var, int16_t int16var, uint16_t uint16var, int32_t int32var, uint32_t uint32var, int64_t int64var, uint64_t uint64var);
+
+    [[eosio::action]] void bltins(symbol_code symcodevar, asset assetvar, symbol symbolvar, extended_symbol extsymvar, extended_asset extassetvar, vector<name> vecvar, map<name, string> mapvar, time_point_sec timevar);
 
 #if WITH_ONERROR_HANDLER == 1
     [[eosio::on_notify("eosio::onerror")]] void onerror(eosio::onerror data);
@@ -277,4 +285,20 @@ private:
         auto primary_key() const { return id; }
     };
     typedef eosio::multi_index< "primitives"_n, primitives_row> primitives;
+
+    struct [[eosio::table]] builtins_row
+    {
+        uint64_t id;
+        symbol_code symcodevar;
+        asset assetvar;
+        symbol symbolvar;
+        extended_symbol extsymvar;
+        extended_asset extassetvar;
+        vector<name> vecvar;
+        map<name, string> mapvar;
+        time_point_sec timevar;
+
+        auto primary_key() const { return id; }
+    };
+    typedef eosio::multi_index< "builtins"_n, builtins_row> builtins;
 };

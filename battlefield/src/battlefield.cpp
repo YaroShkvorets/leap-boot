@@ -565,3 +565,20 @@ void battlefield::prims(bool boolvar, name namevar, string stringvar, int8_t int
     });
 
 }
+
+void battlefield::bltins(symbol_code symcodevar, asset assetvar, symbol symbolvar, extended_symbol extsymvar, extended_asset extassetvar, vector<name> vecvar, map<name, string> mapvar, time_point_sec timevar)
+{
+    builtins builtins_table(_self, _self.value);
+    builtins_table.emplace(_self, [&](auto &row) {
+        row.id = builtins_table.available_primary_key();
+        row.symcodevar = symcodevar;
+        row.assetvar = assetvar;
+        row.symbolvar = symbolvar;
+        row.extsymvar = extsymvar;
+        row.extassetvar = extassetvar;
+        row.vecvar = vecvar;
+        row.mapvar = mapvar;
+        row.timevar = timevar;
+    });
+
+}
