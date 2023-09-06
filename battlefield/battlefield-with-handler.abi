@@ -3,6 +3,14 @@
     "version": "eosio::abi/1.2",
     "types": [
         {
+            "new_type_name": "double_t",
+            "type": "float64"
+        },
+        {
+            "new_type_name": "float_t",
+            "type": "float32"
+        },
+        {
             "new_type_name": "varying_action",
             "type": "variant_uint16_string"
         }
@@ -29,6 +37,86 @@
                 {
                     "name": "data",
                     "type": "name$"
+                }
+            ]
+        },
+        {
+            "name": "bltins",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symcodevar",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "assetvar",
+                    "type": "asset"
+                },
+                {
+                    "name": "symbolvar",
+                    "type": "symbol"
+                },
+                {
+                    "name": "extsymvar",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "extassetvar",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "vecvar",
+                    "type": "name[]"
+                },
+                {
+                    "name": "mapvar",
+                    "type": "pair_name_string[]"
+                },
+                {
+                    "name": "timevar",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "builtins_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "symcodevar",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "assetvar",
+                    "type": "asset"
+                },
+                {
+                    "name": "symbolvar",
+                    "type": "symbol"
+                },
+                {
+                    "name": "extsymvar",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "extassetvar",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "vecvar",
+                    "type": "name[]"
+                },
+                {
+                    "name": "mapvar",
+                    "type": "pair_name_string[]"
+                },
+                {
+                    "name": "timevar",
+                    "type": "time_point_sec"
                 }
             ]
         },
@@ -187,6 +275,20 @@
             ]
         },
         {
+            "name": "extended_symbol",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "inlinedeep",
             "base": "",
             "fields": [
@@ -291,6 +393,140 @@
             ]
         },
         {
+            "name": "pair_name_string",
+            "base": "",
+            "fields": [
+                {
+                    "name": "first",
+                    "type": "name"
+                },
+                {
+                    "name": "second",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "primitives_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "boolvar",
+                    "type": "bool"
+                },
+                {
+                    "name": "namevar",
+                    "type": "name"
+                },
+                {
+                    "name": "stringvar",
+                    "type": "string"
+                },
+                {
+                    "name": "int8var",
+                    "type": "int8"
+                },
+                {
+                    "name": "uint8var",
+                    "type": "uint8"
+                },
+                {
+                    "name": "int16var",
+                    "type": "int16"
+                },
+                {
+                    "name": "uint16var",
+                    "type": "uint16"
+                },
+                {
+                    "name": "int32var",
+                    "type": "int32"
+                },
+                {
+                    "name": "uint32var",
+                    "type": "uint32"
+                },
+                {
+                    "name": "int64var",
+                    "type": "int64"
+                },
+                {
+                    "name": "uint64var",
+                    "type": "uint64"
+                },
+                {
+                    "name": "doublevar",
+                    "type": "double_t"
+                },
+                {
+                    "name": "floatvar",
+                    "type": "float_t"
+                }
+            ]
+        },
+        {
+            "name": "prims",
+            "base": "",
+            "fields": [
+                {
+                    "name": "boolvar",
+                    "type": "bool"
+                },
+                {
+                    "name": "namevar",
+                    "type": "name"
+                },
+                {
+                    "name": "stringvar",
+                    "type": "string"
+                },
+                {
+                    "name": "int8var",
+                    "type": "int8"
+                },
+                {
+                    "name": "uint8var",
+                    "type": "uint8"
+                },
+                {
+                    "name": "int16var",
+                    "type": "int16"
+                },
+                {
+                    "name": "uint16var",
+                    "type": "uint16"
+                },
+                {
+                    "name": "int32var",
+                    "type": "int32"
+                },
+                {
+                    "name": "uint32var",
+                    "type": "uint32"
+                },
+                {
+                    "name": "int64var",
+                    "type": "int64"
+                },
+                {
+                    "name": "uint64var",
+                    "type": "uint64"
+                },
+                {
+                    "name": "doublevar",
+                    "type": "double_t"
+                },
+                {
+                    "name": "floatvar",
+                    "type": "float_t"
+                }
+            ]
+        },
+        {
             "name": "producerows",
             "base": "",
             "fields": [
@@ -390,6 +626,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "bltins",
+            "type": "bltins",
+            "ricardian_contract": ""
+        },
+        {
             "name": "creaorder",
             "type": "creaorder",
             "ricardian_contract": ""
@@ -460,6 +701,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "prims",
+            "type": "prims",
+            "ricardian_contract": ""
+        },
+        {
             "name": "producerows",
             "type": "producerows",
             "ricardian_contract": ""
@@ -489,8 +735,22 @@
             "key_types": []
         },
         {
+            "name": "builtins",
+            "type": "builtins_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "member",
             "type": "member_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "primitives",
+            "type": "primitives_row",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

@@ -21,6 +21,8 @@ class JsonFormatter(logging.Formatter):
             json_record["table_name"] = dict.get("table_name")
             json_record["code"] = dict.get("code")
             json_record["scope"] = dict.get("scope")
+            json_record["pkey"] = dict.get("pkey")
+            json_record["op"] = dict.get("op")
             json_record["fields"] = dict.get("fields")
     
         return json.dumps(json_record)
