@@ -47,8 +47,9 @@ func init() {
 func main() {
 
 	// to generate an expected.json file from the dmlog
-	// generateExpected("dm.log", "dm.log.json")
-	// return
+	generateExpected("dm.log", "dm.log.json")
+	fmt.Println("Generated dm.log.json")
+	return
 
 	ensure(len(os.Args) == 2, "Single argument must be <chain> to compare")
 	chain := os.Args[1]
