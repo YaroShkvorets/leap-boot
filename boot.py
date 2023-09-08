@@ -69,6 +69,25 @@ def run(args):
         print('boot.py: exiting because of error')
         sys.exit(1)
 
+def retry_with_id(args):
+    while True:
+        print('boot.py retry: ', args)
+        
+        # Run the subprocess and capture both stdout and stderr
+        result = subprocess.run(args, shell=True, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        combined_output = result.stdout + result.stderr
+        
+        
+        pattern = r'transaction: (\w{64})'
+        match = re.search(pattern, combined_output)
+        if match:
+            transaction_id = match.group(1)
+            return transaction_id
+        else:
+            print('Error: ', result.stderr)
+            print('*** Retry')
+            sleep(1)
+            
 def retry(args):
     while True:
         print('boot.py retry: ', args)
@@ -422,8 +441,8 @@ def stepSetSystemContract():
 def stepBattlefield():
     stepTitle()
 
-    retry(getCleos() + 'set account permission battlefield1 active --add-code')
-    logAction('eosio', 'eosio', 'updateauth', { 'account': 'battlefield1', 'auth': '*', 'parent': 'owner', 'permission': 'active' })
+    trx_id = retry_with_id(getCleos() + 'set account permission battlefield1 active --add-code')
+    logAction(trx_id, 'eosio', 'eosio', 'updateauth', { 'account': 'battlefield1', 'auth': '*', 'parent': 'owner', 'permission': 'active' })
     retry(getCleos() + 'set account permission battlefield2 active --add-code')
     retry(getCleos() + 'set account permission battlefield3 active --add-code')
     retry(getCleos() + 'set account permission battlefield4 active --add-code')
@@ -450,56 +469,56 @@ def stepBattlefield():
     ')
     
     print('\nSetting contracts')
-    retry(getCleos() + 'system buyram eosio battlefield1 --kbytes 20000')
-    logAction('eosio', 'eosio', 'buyrambytes', { 'bytes': 20480000, 'payer': 'eosio', 'receiver': 'battlefield1' })
-    logDbop('eosio', 'battlefield1', 'userres', 10, 'UPD', { 'cpu_weight': '*', 'net_weight': '*', 'owner': 'battlefield1', 'ram_bytes': '*'})
-    retry(getCleos() + 'system buyram eosio battlefield3 --kbytes 1000')
-    logAction('eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'battlefield3' })
-    retry(getCleos() + 'system buyram eosio notified2 --kbytes 1000')
-    logAction('eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'notified2' })
+    trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield1 --kbytes 20000')
+    logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 20480000, 'payer': 'eosio', 'receiver': 'battlefield1' })
+    logDbop(trx_id, 'eosio', 'battlefield1', 'userres', 10, 'UPD', { 'cpu_weight': '*', 'net_weight': '*', 'owner': 'battlefield1', 'ram_bytes': '*'})
+    trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield3 --kbytes 1000')
+    logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'battlefield3' })
+    trx_id = retry_with_id(getCleos() + 'system buyram eosio notified2 --kbytes 1000')
+    logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'notified2' })
     sleep(0.6)
     
-    retry(getCleos() + 'set contract battlefield1 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
-    logAction('eosio', 'eosio', 'setcode', { 'account': 'battlefield1', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
-    retry(getCleos() + 'set contract battlefield3 ./battlefield battlefield-with-handler.wasm battlefield-with-handler.abi')
-    logAction('eosio', 'eosio', 'setcode', { 'account': 'battlefield3', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
-    retry(getCleos() + 'set contract notified2 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
-    logAction('eosio', 'eosio', 'setcode', { 'account': 'notified2', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
+    trx_id = retry_with_id(getCleos() + 'set contract battlefield1 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
+    logAction(trx_id, 'eosio', 'eosio', 'setcode', { 'account': 'battlefield1', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
+    trx_id = retry_with_id(getCleos() + 'set contract battlefield3 ./battlefield battlefield-with-handler.wasm battlefield-with-handler.abi')
+    logAction(trx_id, 'eosio', 'eosio', 'setcode', { 'account': 'battlefield3', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
+    trx_id = retry_with_id(getCleos() + 'set contract notified2 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
+    logAction(trx_id, 'eosio', 'eosio', 'setcode', { 'account': 'notified2', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
     sleep(0.6)
 
-    retry(getCleos() + 'push action battlefield1 prims \'{"boolvar": true, "namevar": "battlefield1", "stringvar": "some string", "int8var": -1, "uint8var": 2, "int16var": -3, "uint16var": 4, "int32var": -5, "uint32var": 6, "int64var": -7, "uint64var": 8, "doublevar": 9.123456789, "floatvar": 10.12345}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'prims', { 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8, 'doublevar': '9.12345678900000046', 'floatvar': '10.12345027923583984' })
-    logDbop('battlefield1', 'battlefield1', 'primitives', '............1', 'INS', { 'id': 1, 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8, 'doublevar': 9.123456789, 'floatvar': 10.12345027923584 })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 prims \'{"boolvar": true, "namevar": "battlefield1", "stringvar": "some string", "int8var": -1, "uint8var": 2, "int16var": -3, "uint16var": 4, "int32var": -5, "uint32var": 6, "int64var": -7, "uint64var": 8, "doublevar": 9.123456789, "floatvar": 10.12345}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'prims', { 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8, 'doublevar': '9.12345678900000046', 'floatvar': '10.12345027923583984' })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'primitives', '............1', 'INS', { 'id': 1, 'boolvar': 1, 'namevar': 'battlefield1', 'stringvar': 'some string', 'int8var': -1, 'uint8var': 2, 'int16var': -3, 'uint16var': 4, 'int32var': -5, 'uint32var': 6, 'int64var': -7, 'uint64var': 8, 'doublevar': 9.123456789, 'floatvar': 10.12345027923584 })
     sleep(0.6)
 
-    retry(getCleos() + 'push action battlefield1 bltins \'{"symcodevar": "EOS", "assetvar": "1.0000 EOS", "symbolvar": "4,EOS", "extsymvar": {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05"}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'bltins', { 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
-    logDbop('battlefield1', 'battlefield1', 'bltins', '............1', 'INS', { 'id': 1, 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 bltins \'{"symcodevar": "EOS", "assetvar": "1.0000 EOS", "symbolvar": "4,EOS", "extsymvar": {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05"}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'bltins', { 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'bltins', '............1', 'INS', { 'id': 1, 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
     sleep(0.6)
 
 
-    retry(getCleos() + 'push action battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dbins', { 'account': 'battlefield1' })
-    logDbop('battlefield1', 'battlefield1', 'member', '............1', 'INS', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "inserted billed to calling account"})
-    logDbop('battlefield1', 'battlefield1', 'member', '............2', 'INS', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "inserted billed to self"})
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dbins', { 'account': 'battlefield1' })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '............1', 'INS', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "inserted billed to calling account"})
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '............2', 'INS', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "inserted billed to self"})
     sleep(0.6)
 
-    retry(getCleos() + 'push action battlefield1 dbupd \'{"account": "battlefield2"}\' -p battlefield2')
-    logAction('battlefield1', 'battlefield1', 'dbupd', { 'account': 'battlefield2' })
-    logDbop('battlefield1', 'battlefield1', 'member', '............1', 'UPD', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "updated row 1"})
-    logDbop('battlefield1', 'battlefield1', 'member', '............2', 'UPD', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "updated row 2"})
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dbupd \'{"account": "battlefield2"}\' -p battlefield2')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dbupd', { 'account': 'battlefield2' })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '............1', 'UPD', { "account": "dbops1", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 1, "memo": "updated row 1"})
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '............2', 'UPD', { "account": "dbops2", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 2, "memo": "updated row 2"})
     sleep(0.6)
 
-    retry(getCleos() + 'push action battlefield1 dbrem \'{"account": "battlefield1"}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dbrem', { 'account': 'battlefield1' })
-    logDbop('battlefield1', 'battlefield1', 'member', '............1', 'REM', {})
-    logDbop('battlefield1', 'battlefield1', 'member', '............2', 'REM', {})
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dbrem \'{"account": "battlefield1"}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dbrem', { 'account': 'battlefield1' })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '............1', 'REM', {})
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '............2', 'REM', {})
     sleep(0.6)
 
-    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
-    retry(getCleos() + 'push action battlefield1 dtrxcancel \'{"account": "battlefield1"}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dtrxcancel', { 'account': 'battlefield1' })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dtrxcancel \'{"account": "battlefield1"}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrxcancel', { 'account': 'battlefield1' })
     sleep(0.6)
 
     background(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": true, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
@@ -507,79 +526,79 @@ def stepBattlefield():
     sleep(0.6)
 
     # `send_deferred` with `replace_existing` enabled, to test `MODIFY` clauses.
-    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
-    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "2"}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "2" })
-    logAction('battlefield1', 'battlefield1', 'dtrxexec', { "account": "battlefield1", "fail": 0, "failNested": 0, "nonce": "2" })
-    logAction('battlefield1', 'battlefield1', 'nestdtrxexec', { "fail": 0 })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "2"}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "2" })
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrxexec', { "account": "battlefield1", "fail": 0, "failNested": 0, "nonce": "2" })
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'nestdtrxexec', { "fail": 0 })
     sleep (0.6)
 
-    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 1, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 1, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
     print('\nWaiting for the transaction to fail (no onerror handler)...')
     sleep(1.1)
 
-    retry(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": true, "delay_sec": 1, "nonce": "2"}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 1, "fail_now": 0, "nonce": "2" })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": true, "delay_sec": 1, "nonce": "2"}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 1, "fail_now": 0, "nonce": "2" })
     print('\nWaiting for the transaction to fail (no onerror handler)...')
     sleep(1.1)
 
-    retry(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield3')
-    logAction('battlefield3', 'battlefield3', 'dtrx', { "account": "battlefield3", "delay_sec": 1, "fail_later": 1, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield3')
+    logAction(trx_id, 'battlefield3', 'battlefield3', 'dtrx', { "account": "battlefield3", "delay_sec": 1, "fail_later": 1, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
     # soft error
-    logAction('eosio', 'battlefield3', 'onerror', { 'sender_id': '*', 'sent_trx': '*' })
+    logAction(trx_id, 'eosio', 'battlefield3', 'onerror', { 'sender_id': '*', 'sent_trx': '*' })
     print('\nWaiting for the transaction to fail (with onerror handler that succeed)...')
     sleep(1.1)
 
-    retry(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "f"}\' -p battlefield3')
-    logAction('battlefield3', 'battlefield3', 'dtrx', { "account": "battlefield3", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 1, "fail_now": 0, "nonce": "2" })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "f"}\' -p battlefield3')
+    logAction(trx_id, 'battlefield3', 'battlefield3', 'dtrx', { "account": "battlefield3", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 1, "fail_now": 0, "nonce": "2" })
     # soft error
-    logAction('eosio', 'battlefield3', 'onerror', { 'sender_id': '*', 'sent_trx': '*' })
+    logAction(trx_id, 'eosio', 'battlefield3', 'onerror', { 'sender_id': '*', 'sent_trx': '*' })
     print('\nWaiting for the transaction to fail (with onerror handler that failed)...')
     sleep(1.1)
 
-    retry(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "nf"}\' -p battlefield3')
-    logAction('battlefield3', 'battlefield3', 'dtrx', { "account": "battlefield3", "delay_sec": 1, "fail_later": 1, "fail_later_nested": 0, "fail_now": 0, "nonce": "nf" })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield3 dtrx \'{"account": "battlefield3", "fail_now": false, "fail_later": true, "fail_later_nested": false, "delay_sec": 1, "nonce": "nf"}\' -p battlefield3')
+    logAction(trx_id, 'battlefield3', 'battlefield3', 'dtrx', { "account": "battlefield3", "delay_sec": 1, "fail_later": 1, "fail_later_nested": 0, "fail_now": 0, "nonce": "nf" })
     print('\nWaiting for the transaction to fail (with onerror handler that failed inside a nested action)...')
     sleep(1.1)
 
-    retry(getCleos() + 'push action battlefield1 dbinstwo \'{"account": "battlefield1", "first": 100, "second": 101}\' -p battlefield1')
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dbinstwo \'{"account": "battlefield1", "first": 100, "second": 101}\' -p battlefield1')
     # ?????
     # This TX will do one DB_OPERATION for writing, and the second will fail. We want our instrumentation NOT to keep that DB_OPERATION.
-    logAction('battlefield1', 'battlefield1', 'dbinstwo', { 'account': 'battlefield1', 'first': 100, 'second': 101 })
-    logDbop('battlefield1', 'battlefield1', 'member', '...........a4', 'INS', { "account": "...........a4", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
-    logDbop('battlefield1', 'battlefield1', 'member', '...........a5', 'INS', { "account": "...........a5", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dbinstwo', { 'account': 'battlefield1', 'first': 100, 'second': 101 })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '...........a4', 'INS', { "account": "...........a4", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '...........a5', 'INS', { "account": "...........a5", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
     
 
-    retry(getCleos() + 'push action --delay-sec=1 battlefield1 dbinstwo \'{"account": "battlefield1", "first": 102, "second": 100}\' -p battlefield1')
+    trx_id = retry_with_id(getCleos() + 'push action --delay-sec=1 battlefield1 dbinstwo \'{"account": "battlefield1", "first": 102, "second": 100}\' -p battlefield1')
     # this one fails, nothing on chain
     print('\nWaiting for the transaction to fail, yet attempt to write to storage')
     sleep(1.1)
 
-    retry(getCleos() + 'push action battlefield1 dbremtwo \'{"account": "battlefield1", "first": 100, "second": 101}\' -p battlefield1')
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dbremtwo \'{"account": "battlefield1", "first": 100, "second": 101}\' -p battlefield1')
     # This TX will show a delay transaction (deferred) that succeeds
     retry(getCleos() + 'push action --delay-sec=1 eosio.token transfer \'{"from": "eosio", "to": "battlefield1", "quantity": "1.0000 SYS", "memo":"push delayed trx"}\' -p eosio')
-    logAction('battlefield1', 'battlefield1', 'dbremtwo', { 'account': 'battlefield1', 'first': 100, 'second': 101 })
-    logDbop('battlefield1', 'battlefield1', 'member', '...........a4', 'REM', {})
-    logDbop('battlefield1', 'battlefield1', 'member', '...........a5', 'REM', {})
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dbremtwo', { 'account': 'battlefield1', 'first': 100, 'second': 101 })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '...........a4', 'REM', {})
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '...........a5', 'REM', {})
     sleep(1.1)
 
     # This is to see how the RAM_USAGE behaves, when a deferred hard_fails. Does it refund the deferred_trx_remove ? What about the other RAM tweaks? Any one them saved?
-    retry(getCleos() + 'push action battlefield1 dbinstwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dbinstwo', { 'account': 'battlefield1', 'first': 200, 'second': 201 })
-    logDbop('battlefield1', 'battlefield1', 'member', '...........gc', 'INS', { "account": "...........gc", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
-    logDbop('battlefield1', 'battlefield1', 'member', '...........gd', 'INS', { "account": "...........gd", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dbinstwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dbinstwo', { 'account': 'battlefield1', 'first': 200, 'second': 201 })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '...........gc', 'INS', { "account": "...........gc", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 100, "memo": "inserted billed to calling account"})
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '...........gd', 'INS', { "account": "...........gd", "amount": "0 ", "created_at": "*", "expires_at": "1970-01-01T00:00:00", "id": 101, "memo": "inserted billed to self"})
     print('\n')
 
     sleep(0.6)
-    retry(getCleos() + 'push action battlefield1 dbremtwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
-    logAction('battlefield1', 'battlefield1', 'dbremtwo', { 'account': 'battlefield1', 'first': 200, 'second': 201 })
-    logDbop('battlefield1', 'battlefield1', 'member', '...........gc', 'REM', {})
-    logDbop('battlefield1', 'battlefield1', 'member', '...........gd', 'REM', {})
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 dbremtwo \'{"account": "battlefield1", "first": 200, "second": 201}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'dbremtwo', { 'account': 'battlefield1', 'first': 200, 'second': 201 })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '...........gc', 'REM', {})
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'member', '...........gd', 'REM', {})
 
     # Create a delayed and cancel it (in same block) with \'eosio:canceldelay\''
-    retry(getCleos() + 'push action --delay-sec=3600 battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1 --json-file /tmp/delayed.json')
+    trx_id = retry_with_id(getCleos() + 'push action --delay-sec=3600 battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1 --json-file /tmp/delayed.json')
     with open('/tmp/delayed.json', 'r') as file:
         data = json.load(file)
     retry(getCleos() + 'system canceldelay battlefield1 active ' + data["transaction_id"])
@@ -587,7 +606,7 @@ def stepBattlefield():
     sleep(0.6)
 
     # Create a delayed and cancel it (in the next block) with \'eosio:canceldelay\''
-    retry(getCleos() + 'push action --delay-sec=3600 battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1 --json-file /tmp/delayed.json')
+    trx_id = retry_with_id(getCleos() + 'push action --delay-sec=3600 battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1 --json-file /tmp/delayed.json')
     with open('/tmp/delayed.json', 'r') as file:
         data = json.load(file)
     sleep(1.1)
@@ -597,24 +616,24 @@ def stepBattlefield():
 
     print('\nCreate auth structs, updateauth to create, updateauth to modify, deleteauth to test AUTH_OPs')
     # random key
-    retry(getCleos() + 'set account permission battlefield2 ops EOS7f5watu1cLgth3ub1uAnsGkHq1F6PhauScBg6rJGUfe79MgG9Y active')
-    logAction('eosio', 'eosio', 'updateauth', { 'account': 'battlefield1', 'auth': '*', 'parent': 'active', 'permission': 'ops' })
+    trx_id = retry_with_id(getCleos() + 'set account permission battlefield2 ops EOS7f5watu1cLgth3ub1uAnsGkHq1F6PhauScBg6rJGUfe79MgG9Y active')
+    logAction(trx_id, 'eosio', 'eosio', 'updateauth', { 'account': 'battlefield1', 'auth': '*', 'parent': 'active', 'permission': 'ops' })
     sleep(0.6)
     # back to safe key
-    retry(getCleos() + 'set account permission battlefield2 ops EOS5MHPYyhjBjnQZejzZHqHewPWhGTfQWSVTWYEhDmJu4SXkzgweP')
-    logAction('eosio', 'eosio', 'updateauth', { 'account': 'battlefield1', 'auth': '*', 'parent': 'active', 'permission': 'ops' })
+    trx_id = retry_with_id(getCleos() + 'set account permission battlefield2 ops EOS5MHPYyhjBjnQZejzZHqHewPWhGTfQWSVTWYEhDmJu4SXkzgweP')
+    logAction(trx_id, 'eosio', 'eosio', 'updateauth', { 'account': 'battlefield1', 'auth': '*', 'parent': 'active', 'permission': 'ops' })
     sleep(0.6)
 
-    retry(getCleos() + 'set action permission battlefield2 eosio.token transfer ops')
-    logAction('eosio', 'eosio', 'linkauth', { 'account': 'battlefield1', 'code': 'eosio.token', 'requirement': 'ops', 'type': 'transfer' })
+    trx_id = retry_with_id(getCleos() + 'set action permission battlefield2 eosio.token transfer ops')
+    logAction(trx_id, 'eosio', 'eosio', 'linkauth', { 'account': 'battlefield1', 'code': 'eosio.token', 'requirement': 'ops', 'type': 'transfer' })
     sleep(0.6)
 
-    retry(getCleos() + 'set action permission battlefield2 eosio.token transfer NULL')
-    logAction('eosio', 'eosio', 'unlinkauth', { 'account': 'battlefield1', 'code': 'eosio.token', 'type': 'transfer' })
+    trx_id = retry_with_id(getCleos() + 'set action permission battlefield2 eosio.token transfer NULL')
+    logAction(trx_id, 'eosio', 'eosio', 'unlinkauth', { 'account': 'battlefield1', 'code': 'eosio.token', 'type': 'transfer' })
     sleep(0.6)
 
-    retry(getCleos() + 'set account permission battlefield2 ops NULL')
-    logAction('eosio', 'eosio', 'deleteauth', { 'account': 'battlefield1', 'permission': 'ops' })
+    trx_id = retry_with_id(getCleos() + 'set account permission battlefield2 ops NULL')
+    logAction(trx_id, 'eosio', 'eosio', 'deleteauth', { 'account': 'battlefield1', 'permission': 'ops' })
     sleep(0.6)
 
     print("\nCreate a creational order different than the execution order")
@@ -744,7 +763,7 @@ parser.add_argument('--nodes-dir', metavar='', help="Path to nodes directory", d
 parser.add_argument('--genesis', metavar='', help="Path to genesis.json", default="./genesis.json")
 parser.add_argument('--wallet-dir', metavar='', help="Path to wallet directory", default='./wallet/')
 parser.add_argument('--log-path', metavar='', help="Path to log file", default='./output.log')
-parser.add_argument('--actionlog-path', metavar='', help="Path to action log file", default='./actions.log')
+parser.add_argument('--actionlog-path', metavar='', help="Path to action log file", default='./expected.jsonl')
 parser.add_argument('--dmlog-path', metavar='', help="Path to deepmind log file", default='./dm.log')
 parser.add_argument('--symbol', metavar='', help="The eosio.system symbol", default='SYS')
 parser.add_argument('--user-limit', metavar='', help="Max number of users. (0 = no limit)", type=int, default=3000)

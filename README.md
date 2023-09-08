@@ -16,4 +16,4 @@ $ pip install -r requirements.txt
 
 ## Validation (TODO)
 * Run `firehose-antelope` in strict mode to decode `dm.log` and dump the resulting blocks into `dm.log.json`
-* Run script that extracts actions/dbops from decoded blocks and compares them with expected actions/dbops from `actions.log.jsonl`
+* Run script that extracts actions/dbops from decoded blocks and compares them with expected actions/dbops from `expected.jsonl`
