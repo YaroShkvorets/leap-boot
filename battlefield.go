@@ -6,6 +6,7 @@ import (
 	"github.com/streamingfast/bstream"
 	firecore "github.com/streamingfast/firehose-core"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"io"
 	"io/ioutil"
@@ -22,7 +23,6 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/pinax-network/firehose-antelope/codec"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
-	"github.com/streamingfast/jsonpb"
 	"github.com/streamingfast/logging"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
@@ -131,7 +131,7 @@ func writeActualBlocks(actualFile string, blocks []*pbantelope.Block) {
 	if blockCount > 0 {
 		lastIndex := blockCount - 1
 		for i, block := range blocks {
-			out, err := jsonpb.MarshalIndentToString(block, "  ")
+			out, err := MarshalIndentToString(block, "  ")
 			noError(err, "Unable to marshal block %q", block.AsRef())
 
 			_, err = file.WriteString(out)
@@ -176,8 +176,8 @@ func readActualBlocks(filePath string) []*pbantelope.Block {
 			block, ok := el.ToProtocol().(*pbantelope.Block)
 			ensure(ok, `Read block is not a "pbantelope.Block" but should have been`)
 
-			lastBlockRead = sanitizeBlock(block)
-			blocks = append(blocks, lastBlockRead)
+			// lastBlockRead = sanitizeBlock(block)
+			blocks = append(blocks, block)
 		}
 
 		if err == io.EOF {
@@ -430,4 +430,13 @@ func blockReaderFactory(reader io.Reader) (bstream.BlockReader, error) {
 
 func blockWriterFactory(writer io.Writer) (bstream.BlockWriter, error) {
 	return bstream.NewDBinBlockWriter(writer, pbbstream.Protocol_EOS.String(), 1)
+}
+
+func MarshalIndentToString(m proto.Message, indent string) (string, error) {
+	res, err := protojson.MarshalOptions{Indent: indent}.Marshal(m)
+	if err != nil {
+		return "", err
+	}
+
+	return string(res), err
 }
