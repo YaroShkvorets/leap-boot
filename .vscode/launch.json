@@ -8,11 +8,11 @@
             "name": "Python: compare.py expected.jsonl",
             "type": "python",
             "request": "launch",
-            "program": "compare.py",
+            "program": "python/compare.py",
             "console": "integratedTerminal",
             "args": [
-                "expected.jsonl",
-                "dm.log.json"
+                "./run/expected.jsonl",
+                "./run/dm.log.json"
             ],
             "justMyCode": true
         },

@@ -578,7 +578,7 @@ void battlefield::setprim(uint64_t id, bool boolvar)
     });
 }
 
-void battlefield::bltins(symbol_code symcodevar, asset assetvar, symbol symbolvar, extended_symbol extsymvar, extended_asset extassetvar, vector<name> vecvar, map<name, string> mapvar, time_point_sec timevar)
+void battlefield::bltins(symbol_code symcodevar, asset assetvar, symbol symbolvar, extended_symbol extsymvar, extended_asset extassetvar, vector<name> vecvar, map<name, string> mapvar, time_point_sec timevar, varying_action vari1, varying_action vari2)
 {
     builtins builtins_table(_self, _self.value);
     builtins_table.emplace(_self, [&](auto &row) {
@@ -591,6 +591,8 @@ void battlefield::bltins(symbol_code symcodevar, asset assetvar, symbol symbolva
         row.vecvar = vecvar;
         row.mapvar = mapvar;
         row.timevar = timevar;
+        row.vari1 = vari1;
+        row.vari2 = vari2;
     });
 
 }

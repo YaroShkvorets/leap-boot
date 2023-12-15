@@ -317,7 +317,7 @@ def randomTransfer(b, e, num):
         trx_id = retry_with_id(getCleos(True) + 'transfer -f ' + src + ' ' + dest + ' "0.0001 ' + args.symbol + '" "transfer from ' + src + ' to ' + dest + '" || true')
         logAction(trx_id, 'eosio.token', src, 'transfer', { 'from': src, 'to': dest, 'quantity': '0.0001 ' + args.symbol, 'memo': 'transfer from ' + src + ' to ' + dest })
         logAction(trx_id, 'eosio.token', dest, 'transfer', { 'from': src, 'to': dest, 'quantity': '0.0001 ' + args.symbol, 'memo': 'transfer from ' + src + ' to ' + dest })
-        sleep(0.1)
+        sleep(0.5)
 
 def msigProposeReplaceSystem(proposer, proposalName):
     requestedPermissions = []
@@ -476,19 +476,21 @@ def stepBattlefield():
     print('\nSetting contracts')
     trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield1 --kbytes 20000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 20480000, 'payer': 'eosio', 'receiver': 'battlefield1' })
-    logDbop(trx_id, 'eosio', 'eosio', 'userres', 'cpd4ykuhc5d.4', 'UPD', {"base":{"balance":"*","weight":"0.50000000000000000"},"quote":{"balance":"*","weight":"0.50000000000000000"},"supply":"10000000000.0000 RAMCORE"})
-    logDbop(trx_id, 'eosio', 'battlefield1', 'userres', 'battlefield1', 'UPD', { 'cpu_weight': '*', 'net_weight': '*', 'owner': 'battlefield1', 'ram_bytes': '*'})
+    logDbop(trx_id, 'eosio', 'eosio', 'rammarket', 'cpd4ykuhc5d.4', 'UPD', {"base":{"balance":"68718246002 RAM","weight":"0.50000000000000000"},"quote":{"balance":"10000179.1000 SYS","weight":"0.50000000000000000"},"supply":"10000000000.0000 RAMCORE"})
+    logDbop(trx_id, 'eosio', 'battlefield1', 'userres', 'battlefield1', 'UPD', {"cpu_weight":"* SYS","net_weight":"*","owner":"battlefield1","ram_bytes":"*"})
     trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield3 --kbytes 1000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'battlefield3' })
     trx_id = retry_with_id(getCleos() + 'system buyram eosio notified2 --kbytes 1000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'notified2' })
     sleep(0.6)
     
-    trx_id = retry_with_id(getCleos() + 'set contract battlefield1 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
+    trx_id = retry_with_id(getCleos() + 'set contract battlefield1 ./battlefield battlefield.wasm battlefield.abi')
     logAction(trx_id, 'eosio', 'eosio', 'setcode', { 'account': 'battlefield1', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
-    trx_id = retry_with_id(getCleos() + 'set contract battlefield3 ./battlefield battlefield-with-handler.wasm battlefield-with-handler.abi')
+    sleep(0.3)
+    trx_id = retry_with_id(getCleos() + 'set contract battlefield3 ./battlefield battlefield.wasm battlefield.abi')
     logAction(trx_id, 'eosio', 'eosio', 'setcode', { 'account': 'battlefield3', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
-    trx_id = retry_with_id(getCleos() + 'set contract notified2 ./battlefield battlefield-without-handler.wasm battlefield-without-handler.abi')
+    sleep(0.3)
+    trx_id = retry_with_id(getCleos() + 'set contract notified2 ./battlefield battlefield.wasm battlefield.abi')
     logAction(trx_id, 'eosio', 'eosio', 'setcode', { 'account': 'notified2', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
     sleep(0.6)
 
@@ -512,9 +514,9 @@ def stepBattlefield():
     logDbop(trx_id, 'battlefield1', 'battlefield1', 'primitives', '............1', 'UPD', { 'id': 1, 'boolvar': 1})
     sleep(0.6)
 
-    trx_id = retry_with_id(getCleos() + 'push action battlefield1 bltins \'{"symcodevar": "EOS", "assetvar": "1.0000 EOS", "symbolvar": "4,EOS", "extsymvar": {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05"}\' -p battlefield1')
-    logAction(trx_id, 'battlefield1', 'battlefield1', 'bltins', { 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
-    logDbop(trx_id, 'battlefield1', 'battlefield1', 'builtins', '', 'INS', { 'id': 0, 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05" })
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 bltins \'{"symcodevar": "EOS", "assetvar": "1.0000 EOS", "symbolvar": "4,EOS", "extsymvar": {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05", "vari1": ["uint16", 20], "vari2": ["string", "vari string"]}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'bltins', { 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05", "vari1": ["uint16", 20], "vari2": ["string", "vari string"]})
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'builtins', '', 'INS', { 'id': 0, 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05", "vari1": ["uint16", 20], "vari2": ["string", "vari string"] })
     sleep(0.6)
 
 
@@ -540,7 +542,7 @@ def stepBattlefield():
     logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrx', { "account": "battlefield1", "delay_sec": 1, "fail_later": 0, "fail_later_nested": 0, "fail_now": 0, "nonce": "1" })
     trx_id = retry_with_id(getCleos() + 'push action battlefield1 dtrxcancel \'{"account": "battlefield1"}\' -p battlefield1')
     logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrxcancel', { 'account': 'battlefield1' })
-    sleep(0.6)
+    sleep(1)
 
     # background(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": true, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
     # print("\nThe error message you see above ^^^ is OK, we were expecting the transaction to fail, continuing....")
@@ -682,7 +684,7 @@ def stepBattlefield():
     logDbop(trx_id, 'battlefield1', 'battlefield1', 'variant', '', 'INS', { 'creation_number': '*', 'id': 0, 'variant_field': ['uint16', 12] })
     trx_id = retry_with_id(getCleos() + 'push action battlefield1 varianttest \'{"value":["string","this is a long value"]}\' -p battlefield1')
     logAction(trx_id, 'battlefield1', 'battlefield1', 'varianttest', { 'value': ['string', 'this is a long value'] })
-    logDbop(trx_id, 'battlefield1', 'battlefield1', 'variant', '............1', 'INS', { 'creation_number': '*', 'id': 1, 'variant_field': ['int32', 20] })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'variant', '............1', 'INS', { 'creation_number': '*', 'id': 1, 'variant_field': ['string', 'this is a long value'] })
     sleep(0.6)
 
     ## Series of test for secondary keys
@@ -751,8 +753,6 @@ def stepBattlefield():
     # create a bunch of rows
     trx_id = retry_with_id(getCleos() + 'push action battlefield1 producerows \'{"row_count": 100}\' -p battlefield1 > /dev/null')
     logAction(trx_id, 'battlefield1', 'battlefield1', 'producerows', { 'row_count': 100 })
-    # logDbop(trx_id, 'battlefield1', 'battlefield1', 'variant', str(offset + 2).rjust(13, '.'), 'INS', { 'creation_number': offset, 'id': offset + 2, 'variant_field': ['int32', 0] })
-    # logDbop(trx_id, 'battlefield1', 'battlefield1', 'variant', str(offset + 2).rjust(13, '.'), 'INS', { 'creation_number': offset, 'id': offset + 3, 'variant_field': ['int8', 0] })
 
     
     sleep(3)

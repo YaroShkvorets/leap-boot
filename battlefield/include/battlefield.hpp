@@ -88,7 +88,7 @@ public:
 
     [[eosio::action]] void setprim(uint64_t id, bool boolvar);
 
-    [[eosio::action]] void bltins(symbol_code symcodevar, asset assetvar, symbol symbolvar, extended_symbol extsymvar, extended_asset extassetvar, vector<name> vecvar, map<name, string> mapvar, time_point_sec timevar);
+    [[eosio::action]] void bltins(symbol_code symcodevar, asset assetvar, symbol symbolvar, extended_symbol extsymvar, extended_asset extassetvar, vector<name> vecvar, map<name, string> mapvar, time_point_sec timevar, varying_action vari1, varying_action vari2);
 
 #if WITH_ONERROR_HANDLER == 1
     [[eosio::on_notify("eosio::onerror")]] void onerror(eosio::onerror data);
@@ -301,6 +301,8 @@ private:
         vector<name> vecvar;
         map<name, string> mapvar;
         time_point_sec timevar;
+        varying_action vari1;
+        varying_action vari2;
 
         auto primary_key() const { return id; }
     };

@@ -86,18 +86,20 @@ def main():
 
     dmlog_actions, dmlog_dbops = extract_dmlog_records(dmlog_data)
 
+    failed = 0
     index = -1
     actions = 0
     for record in expected_records:
         trx_id = record['trx_id']
         if record['type'] == 'action':
             # print("Looking for action %s::%s in %s ... " % (record['account'], record['action_name'], trx_id), end='')
-            index = find_action(record, dmlog_actions, index + 1)
-            if index == None:
-                bail("No action found for %s:%s @ trx %s" % (record.get('account'), record.get('action_name'), trx_id))
-            # else: 
-            #     print("SUCCESS - globalSequence: %d" % (index + 1))
-            actions += 1
+            found = find_action(record, dmlog_actions, index)
+            if found == None:
+                print("No action found for %s:%s @ trx %s" % (record.get('account'), record.get('action_name'), trx_id))
+                failed += 1
+            else: 
+                index = found + 1
+                actions += 1
         elif record['type'] != 'dbop':
             print("Invalid record type: %s for trx_id %s", record['type'], trx_id)
 
@@ -106,14 +108,18 @@ def main():
     for record in expected_records:
         trx_id = record['trx_id']
         if record['type'] == 'dbop':
-            index = find_dbop(record, dmlog_dbops, index + 1)
-            if index == None:
-                bail("No matching dbop found for table update %s:%s @ trx %s" % (record.get('code'), record.get('table_name'), trx_id))
-            # else: 
-            #     print("SUCCESS - globalSequence: %d" % (index + 1))
-            db_ops += 1
+            found = find_dbop(record, dmlog_dbops, index)
+            if found == None:
+                print("No matching dbop found for table update %s:%s @ trx %s" % (record.get('code'), record.get('table_name'), trx_id))
+                failed += 1
+            else: 
+                index = found + 1
+                db_ops += 1
 
-    print("Validated %d actions and %d db_ops successfully" % (actions, db_ops))
+    if failed > 0:
+        bail("🛑 Failed %d out of %d actions and db_ops - see above" % (failed, actions + db_ops))
+    
+    print("✅ Validated %d actions and %d db_ops successfully" % (actions, db_ops))
 
 
 

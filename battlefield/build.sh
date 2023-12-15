@@ -41,11 +41,8 @@ function build() {
     -I${ROOT}/include \
     -D $define \
     -contract battlefield \
-    -o "${ROOT}/battlefield-${name}.wasm" \
+    -o "${ROOT}/battlefield.wasm" \
     src/battlefield.cpp
 }
-
-build "with-handler" "WITH_ONERROR_HANDLER=1"
-echo ""
 
 build "without-handler" "WITH_ONERROR_HANDLER=0"

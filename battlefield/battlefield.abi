@@ -75,6 +75,14 @@
                 {
                     "name": "timevar",
                     "type": "time_point_sec"
+                },
+                {
+                    "name": "vari1",
+                    "type": "varying_action"
+                },
+                {
+                    "name": "vari2",
+                    "type": "varying_action"
                 }
             ]
         },
@@ -117,6 +125,14 @@
                 {
                     "name": "timevar",
                     "type": "time_point_sec"
+                },
+                {
+                    "name": "vari1",
+                    "type": "varying_action"
+                },
+                {
+                    "name": "vari2",
+                    "type": "varying_action"
                 }
             ]
         },
