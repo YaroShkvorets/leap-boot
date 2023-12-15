@@ -547,6 +547,20 @@
             ]
         },
         {
+            "name": "setprim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "boolvar",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
             "name": "sk_row",
             "base": "",
             "fields": [
@@ -713,6 +727,11 @@
         {
             "name": "retvalue",
             "type": "retvalue",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setprim",
+            "type": "setprim",
             "ricardian_contract": ""
         },
         {

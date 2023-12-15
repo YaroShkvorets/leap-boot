@@ -1,5 +1,7 @@
 # leap-boot
 
+These scripts are used to test deep-mind logs produced by leap, their decoding and validation against expected data
+
 ## Prerequsites
 * Ubuntu 20.04/22.04
 * Leap with cleos and keosd

@@ -86,6 +86,8 @@ public:
 
     [[eosio::action]] void prims(bool boolvar, name namevar, string stringvar, int8_t int8var, uint8_t uint8var, int16_t int16var, uint16_t uint16var, int32_t int32var, uint32_t uint32var, int64_t int64var, uint64_t uint64var, double_t doublevar, float_t floatvar);
 
+    [[eosio::action]] void setprim(uint64_t id, bool boolvar);
+
     [[eosio::action]] void bltins(symbol_code symcodevar, asset assetvar, symbol symbolvar, extended_symbol extsymvar, extended_asset extassetvar, vector<name> vecvar, map<name, string> mapvar, time_point_sec timevar);
 
 #if WITH_ONERROR_HANDLER == 1

@@ -568,6 +568,16 @@ void battlefield::prims(bool boolvar, name namevar, string stringvar, int8_t int
 
 }
 
+void battlefield::setprim(uint64_t id, bool boolvar)
+{
+    primitives primitives_table(_self, _self.value);
+    auto itr = primitives_table.find(id);
+    check(itr != primitives_table.end(), "id not found");
+    primitives_table.modify(itr, _self, [&](auto &row) {
+        row.boolvar = boolvar;
+    });
+}
+
 void battlefield::bltins(symbol_code symcodevar, asset assetvar, symbol symbolvar, extended_symbol extsymvar, extended_asset extassetvar, vector<name> vecvar, map<name, string> mapvar, time_point_sec timevar)
 {
     builtins builtins_table(_self, _self.value);

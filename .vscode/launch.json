@@ -5,11 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python: compare.py expected.jsonl",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "compare.py",
             "console": "integratedTerminal",
+            "args": [
+                "expected.jsonl",
+                "dm.log.json"
+            ],
+            "justMyCode": true
+        },
+        {
+            "name": "Python compare.py log1.jsonl",
+            "type": "python",
+            "request": "launch",
+            "program": "compare.py",
+            "console": "integratedTerminal",
+            "args": [
+                "log1.jsonl",
+                "log2.json"
+            ],
             "justMyCode": true
         },
         {
