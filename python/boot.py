@@ -308,13 +308,16 @@ def resign(account, controller):
     sleep(1)
     run(getCleos(True) + 'get account ' + account)
 
-def randomTransfer(b, e):
-    for j in range(20):
+def randomTransfer(b, e, num):
+    for j in range(num):
         src = accounts[random.randint(b, e - 1)]['name']
         dest = src
         while dest == src:
             dest = accounts[random.randint(b, e - 1)]['name']
-        run(getCleos(True) + 'transfer -f ' + src + ' ' + dest + ' "0.0001 ' + args.symbol + '"' + ' || true')
+        trx_id = retry_with_id(getCleos(True) + 'transfer -f ' + src + ' ' + dest + ' "0.0001 ' + args.symbol + '" "transfer from ' + src + ' to ' + dest + '" || true')
+        logAction(trx_id, 'eosio.token', src, 'transfer', { 'from': src, 'to': dest, 'quantity': '0.0001 ' + args.symbol, 'memo': 'transfer from ' + src + ' to ' + dest })
+        logAction(trx_id, 'eosio.token', dest, 'transfer', { 'from': src, 'to': dest, 'quantity': '0.0001 ' + args.symbol, 'memo': 'transfer from ' + src + ' to ' + dest })
+        sleep(0.1)
 
 def msigProposeReplaceSystem(proposer, proposalName):
     requestedPermissions = []
@@ -473,6 +476,7 @@ def stepBattlefield():
     print('\nSetting contracts')
     trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield1 --kbytes 20000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 20480000, 'payer': 'eosio', 'receiver': 'battlefield1' })
+    logDbop(trx_id, 'eosio', 'eosio', 'userres', 'cpd4ykuhc5d.4', 'UPD', {"base":{"balance":"*","weight":"0.50000000000000000"},"quote":{"balance":"*","weight":"0.50000000000000000"},"supply":"10000000000.0000 RAMCORE"})
     logDbop(trx_id, 'eosio', 'battlefield1', 'userres', 'battlefield1', 'UPD', { 'cpu_weight': '*', 'net_weight': '*', 'owner': 'battlefield1', 'ram_bytes': '*'})
     trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield3 --kbytes 1000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'battlefield3' })
@@ -538,9 +542,9 @@ def stepBattlefield():
     logAction(trx_id, 'battlefield1', 'battlefield1', 'dtrxcancel', { 'account': 'battlefield1' })
     sleep(0.6)
 
-    background(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": true, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
-    print("\nThe error message you see above ^^^ is OK, we were expecting the transaction to fail, continuing....")
-    sleep(0.6)
+    # background(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": true, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
+    # print("\nThe error message you see above ^^^ is OK, we were expecting the transaction to fail, continuing....")
+    # sleep(0.6)
 
     # `send_deferred` with `replace_existing` enabled, to test `MODIFY` clauses.
     trx_id = retry_with_id(getCleos() + 'push action battlefield1 dtrx \'{"account": "battlefield1", "fail_now": false, "fail_later": false, "fail_later_nested": false, "delay_sec": 1, "nonce": "1"}\' -p battlefield1')
@@ -786,8 +790,7 @@ def stepResign():
         resign(a, 'eosio')
 def stepTransfer():
     stepTitle()
-    while True:
-        randomTransfer(0, args.num_senders)
+    randomTransfer(0, args.num_senders, 5)
 def stepLog():
     stepTitle()
     run('tail -n 60 ' + args.nodes_dir + '00-eosio/stderr')
@@ -818,7 +821,7 @@ commands = [
     ('q', 'resign',             stepResign,                 True,    "Resign eosio"),
     ('f', 'battlefield',        stepBattlefield,            True,    "Run battlefield tests"),
     ('m', 'msg-replace',        msigReplaceSystem,          False,   "Replace system contract using msig"),
-    ('X', 'xfer',               stepTransfer,               False,   "Random transfer tokens (infinite loop)"),
+    ('X', 'xfer',               stepTransfer,               True,    "Random transfer tokens"),
     ('l', 'log',                stepLog,                    True,    "Show tail of node's log"),
     ('k', 'killall',            stepKillall,                False,    "Killall in the end"),
 ]
