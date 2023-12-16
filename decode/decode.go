@@ -1,18 +1,16 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"time"
+
 	"github.com/streamingfast/bstream"
 	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
 	firecore "github.com/streamingfast/firehose-core"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
-	"io"
-	"io/ioutil"
-	"os"
-	"os/exec"
-	"strings"
-	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	pbts "github.com/golang/protobuf/ptypes/timestamp"
@@ -51,6 +49,17 @@ func main() {
 	fmt.Printf("Decoded deep-mind log into JSON file: %s", outputFileName)
 }
 
+func generateExpected(dmlogFile, expectedJsonFile string) {
+
+	actualBlocks := readActualBlocks(dmlogFile)
+	zlog.Info("read all blocks from dmlog file", zap.Int("block_count", len(actualBlocks)), zap.String("file", dmlogFile))
+
+	writeActualBlocks(expectedJsonFile, actualBlocks)
+
+	// err := compressFile(expectedJsonFile)
+	// noError(err, "Unable to compress file %q", expectedJsonFile)
+}
+
 func writeActualBlocks(actualFile string, blocks []*pbantelope.Block) {
 	file, err := os.Create(actualFile)
 	noError(err, "Unable to write file %q", actualFile)
@@ -63,7 +72,7 @@ func writeActualBlocks(actualFile string, blocks []*pbantelope.Block) {
 	if blockCount > 0 {
 		lastIndex := blockCount - 1
 		for i, block := range blocks {
-			out, err := MarshalWithOptions(block, "  ", true)
+			out, err := marshalWithOptions(block, "  ", true)
 			noError(err, "Unable to marshal block %q", block.AsRef())
 
 			_, err = file.WriteString(out)
@@ -194,6 +203,15 @@ func sanitizeBlock(block *pbantelope.Block) *pbantelope.Block {
 	}
 
 	return block
+}
+
+func marshalWithOptions(m proto.Message, indent string, emitUnpopulated bool) (string, error) {
+	res, err := protojson.MarshalOptions{Indent: indent, EmitUnpopulated: emitUnpopulated}.Marshal(m)
+	if err != nil {
+		return "", err
+	}
+
+	return string(res), err
 }
 
 func fileExists(path string) bool {
