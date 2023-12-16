@@ -29,11 +29,15 @@
             "justMyCode": true
         },
         {
-            "name": "Launch battlefield.go",
+            "name": "Launch decoder.go",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "./battlefield.go",
+            "program": "./decode/decode.go",
+            "args": [
+                "../run/dm.log",
+                "../run/dm.log.json"
+            ],
         }
     ]
 }
