@@ -47,6 +47,11 @@ class [[eosio::contract("battlefield")]] battlefield : public contract
 public:
     typedef std::variant<uint16_t, string> varying_action;
 
+    struct nested_struct{
+        uint64_t nested_id;
+        vector<varying_action> nested_vari;
+    };
+
     battlefield(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds) {}
 
@@ -84,11 +89,38 @@ public:
 
     [[eosio::action]] uint32_t retvalue(uint32_t n);
 
-    [[eosio::action]] void prims(bool boolvar, name namevar, string stringvar, int8_t int8var, uint8_t uint8var, int16_t int16var, uint16_t uint16var, int32_t int32var, uint32_t uint32var, int64_t int64var, uint64_t uint64var, double_t doublevar, float_t floatvar);
+    [[eosio::action]] void prims(
+        bool boolvar,
+        name namevar,
+        string stringvar,
+        int8_t int8var,
+        uint8_t uint8var,
+        int16_t int16var,
+        uint16_t uint16var,
+        int32_t int32var,
+        uint32_t uint32var,
+        int64_t int64var,
+        uint64_t uint64var,
+        double_t doublevar,
+        float_t floatvar
+    );
 
     [[eosio::action]] void setprim(uint64_t id, bool boolvar);
 
-    [[eosio::action]] void bltins(symbol_code symcodevar, asset assetvar, symbol symbolvar, extended_symbol extsymvar, extended_asset extassetvar, vector<name> vecvar, map<name, string> mapvar, time_point_sec timevar, varying_action vari1, varying_action vari2);
+    [[eosio::action]] void bltins(
+        symbol_code symcodevar,
+        asset assetvar,
+        symbol symbolvar,
+        extended_symbol extsymvar,
+        extended_asset extassetvar,
+        vector<name> vecvar,
+        map<name, string> mapvar,
+        time_point_sec timevar,
+        varying_action vari1,
+        varying_action vari2
+    );
+    
+    [[eosio::action]] void complex(nested_struct nested, vector<varying_action> vari);
 
 #if WITH_ONERROR_HANDLER == 1
     [[eosio::on_notify("eosio::onerror")]] void onerror(eosio::onerror data);
@@ -307,4 +339,14 @@ private:
         auto primary_key() const { return id; }
     };
     typedef eosio::multi_index< "builtins"_n, builtins_row> builtins;
+
+    struct [[eosio::table]] complex_row
+    {
+        uint64_t id;
+        nested_struct nested;
+        vector<varying_action> vari;
+
+        auto primary_key() const { return id; }
+    };
+    typedef eosio::multi_index< "complex"_n, complex_row> complexes;
 };

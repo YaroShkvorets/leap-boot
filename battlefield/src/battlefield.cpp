@@ -596,3 +596,13 @@ void battlefield::bltins(symbol_code symcodevar, asset assetvar, symbol symbolva
     });
 
 }
+
+void battlefield::complex(nested_struct nested, vector<varying_action> vari)
+{
+    complexes complexs_table(_self, _self.value);
+    complexs_table.emplace(_self, [&](auto &row) {
+        row.id = complexs_table.available_primary_key();
+        row.nested = nested;
+        row.vari = vari;
+    });
+}

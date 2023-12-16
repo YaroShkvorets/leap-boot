@@ -137,6 +137,38 @@
             ]
         },
         {
+            "name": "complex",
+            "base": "",
+            "fields": [
+                {
+                    "name": "nested",
+                    "type": "nested_struct"
+                },
+                {
+                    "name": "vari",
+                    "type": "varying_action[]"
+                }
+            ]
+        },
+        {
+            "name": "complex_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "nested",
+                    "type": "nested_struct"
+                },
+                {
+                    "name": "vari",
+                    "type": "varying_action[]"
+                }
+            ]
+        },
+        {
             "name": "creaorder",
             "base": "",
             "fields": [
@@ -385,6 +417,20 @@
                 {
                     "name": "fail",
                     "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "nested_struct",
+            "base": "",
+            "fields": [
+                {
+                    "name": "nested_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "nested_vari",
+                    "type": "varying_action[]"
                 }
             ]
         },
@@ -661,6 +707,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "complex",
+            "type": "complex",
+            "ricardian_contract": ""
+        },
+        {
             "name": "creaorder",
             "type": "creaorder",
             "ricardian_contract": ""
@@ -772,6 +823,13 @@
         {
             "name": "builtins",
             "type": "builtins_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "complex",
+            "type": "complex_row",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

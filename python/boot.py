@@ -477,13 +477,13 @@ def stepBattlefield():
     trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield1 --kbytes 20000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 20480000, 'payer': 'eosio', 'receiver': 'battlefield1' })
     logDbop(trx_id, 'eosio', 'eosio', 'rammarket', 'cpd4ykuhc5d.4', 'UPD', {"base":{"balance":"68718246002 RAM","weight":"0.50000000000000000"},"quote":{"balance":"10000179.1000 SYS","weight":"0.50000000000000000"},"supply":"10000000000.0000 RAMCORE"})
-    logDbop(trx_id, 'eosio', 'battlefield1', 'userres', 'battlefield1', 'UPD', {"cpu_weight":"* SYS","net_weight":"*","owner":"battlefield1","ram_bytes":"*"})
+    logDbop(trx_id, 'eosio', 'battlefield1', 'userres', 'battlefield1', 'UPD', {"cpu_weight":"*","net_weight":"*","owner":"battlefield1","ram_bytes":"*"})
     trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield3 --kbytes 1000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'battlefield3' })
     trx_id = retry_with_id(getCleos() + 'system buyram eosio notified2 --kbytes 1000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'notified2' })
     sleep(0.6)
-    
+
     trx_id = retry_with_id(getCleos() + 'set contract battlefield1 ./battlefield battlefield.wasm battlefield.abi')
     logAction(trx_id, 'eosio', 'eosio', 'setcode', { 'account': 'battlefield1', 'code': '*', 'vmtype': 0, 'vmversion': 0 })
     sleep(0.3)
@@ -519,6 +519,10 @@ def stepBattlefield():
     logDbop(trx_id, 'battlefield1', 'battlefield1', 'builtins', '', 'INS', { 'id': 0, 'symcodevar': 'EOS', 'assetvar': '1.0000 EOS', 'symbolvar': '4,EOS', 'extsymvar': {"contract": "eosio.token", "sym": "4,EOS"}, "extassetvar": {"contract": "eosio.token", "quantity": "1.0000 EOS"}, "vecvar": ["battlefield1", "battlefield2"], "mapvar": [{"first": "k1", "second": "v1"}, {"first": "k2", "second": "v2"}], "timevar": "2023-01-02T03:04:05", "vari1": ["uint16", 20], "vari2": ["string", "vari string"] })
     sleep(0.6)
 
+    trx_id = retry_with_id(getCleos() + 'push action battlefield1 complex \'{"nested": {"nested_id": 123, "nested_vari": [["uint16", 20],["string", "vari string"]]}, "vari": [["uint16", 20],["string", "vari string"]]}\' -p battlefield1')
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'complex', {"nested": {"nested_id": 123, "nested_vari": [["uint16", 20],["string", "vari string"]]}, "vari": [["uint16", 20],["string", "vari string"]]})
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'complex', '', 'INS', { 'id': 0, 'nested': {"nested_id": 123, "nested_vari": [["uint16", 20],["string", "vari string"]]}, "vari": [["uint16", 20],["string", "vari string"]] })
+    sleep(0.6)
 
     trx_id = retry_with_id(getCleos() + 'push action battlefield1 dbins \'{"account": "battlefield1"}\' -p battlefield1')
     logAction(trx_id, 'battlefield1', 'battlefield1', 'dbins', { 'account': 'battlefield1' })
