@@ -4,14 +4,10 @@ go 1.21.0
 
 require (
 	github.com/golang/protobuf v1.5.3
-	github.com/lithammer/dedent v1.1.0
-	github.com/manifoldco/promptui v0.9.0
 	github.com/pinax-network/firehose-antelope v1.0.0
-	github.com/streamingfast/bstream v0.0.2-0.20231211192436-01f6a005b0e4
 	github.com/streamingfast/firehose-core v1.0.0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
 	go.uber.org/zap v1.26.0
-	golang.org/x/crypto v0.14.0
 	google.golang.org/protobuf v1.31.0
 )
 
@@ -78,10 +74,12 @@ require (
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/libp2p/go-flow-metrics v0.1.0 // indirect
 	github.com/libp2p/go-libp2p v0.27.8 // indirect
+	github.com/lithammer/dedent v1.1.0 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/lytics/lifecycle v0.0.0-20130117214539-7b4c4028d422 // indirect
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
+	github.com/manifoldco/promptui v0.9.0 // indirect
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
@@ -119,6 +117,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.15.0 // indirect
+	github.com/streamingfast/bstream v0.0.2-0.20231211192436-01f6a005b0e4 // indirect
 	github.com/streamingfast/cli v0.0.4-0.20230825151644-8cc84512cd80 // indirect
 	github.com/streamingfast/dauth v0.0.0-20231120142446-843f4e045cc2 // indirect
 	github.com/streamingfast/dbin v0.9.1-0.20231117225723-59790c798e2c // indirect
@@ -149,6 +148,7 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/automaxprocs v1.5.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.17.0 // indirect

@@ -1,14 +1,16 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"github.com/streamingfast/bstream"
-	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
-	firecore "github.com/streamingfast/firehose-core"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"os"
+	"reflect"
 	"time"
+
+	firecore "github.com/streamingfast/firehose-core"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/golang/protobuf/ptypes"
 	pbts "github.com/golang/protobuf/ptypes/timestamp"
@@ -24,10 +26,6 @@ var zlog, tracer = logging.PackageLogger("decoder", "github.com/pinax-network/le
 
 func init() {
 	logging.InstantiateLoggers()
-
-	bstream.InitGeneric("EOS", 1, func() proto.Message {
-		return new(pbantelope.Block)
-	})
 
 	fixedTime, _ := time.Parse(time.RFC3339, "2006-01-02T15:04:05Z")
 	fixedTimestamp, _ = ptypes.TimestampProto(fixedTime)
@@ -76,6 +74,15 @@ func writeActualBlocks(actualFile string, blocks []*pbantelope.Block) {
 	noError(err, "Unable to write list end")
 }
 
+func isNil(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+
+	rv := reflect.ValueOf(v)
+	return rv.Kind() == reflect.Ptr && rv.IsNil()
+}
+
 func readActualBlocks(filePath string) []*pbantelope.Block {
 	blocks := []*pbantelope.Block{}
 
@@ -85,28 +92,42 @@ func readActualBlocks(filePath string) []*pbantelope.Block {
 
 	lineChannel := make(chan string)
 
-	consoleReader, err := codec.NewConsoleReader(lineChannel, firecore.NewGenericBlockEncoder(int32(pbbstream.Protocol_EOS)), zlog, tracer)
+	consoleReader, err := codec.NewConsoleReader(lineChannel, firecore.NewBlockEncoder(), zlog, tracer)
 	if err != nil {
 		zlog.Fatal("failed to init console reader", zap.Error(err))
 	}
 
 	go func() {
-		err = consoleReader.ProcessData(file)
-		if err != nil && err != io.EOF {
-			zlog.Fatal("failed to process data", zap.Error(err))
+		err := consoleReader.(*codec.ConsoleReader).ProcessData(file)
+		if !errors.Is(err, io.EOF) {
+			noError(err, "Error reading file %q", filePath)
 		}
 	}()
 
+	var reader = func() (interface{}, error) {
+		out, err := consoleReader.ReadBlock()
+		if err != nil {
+			return nil, err
+		}
+
+		pbBlock := &pbantelope.Block{}
+		err = out.Payload.UnmarshalTo(pbBlock)
+		if err != nil {
+			return nil, err
+		}
+
+		return pbBlock, nil
+	}
+
 	var lastBlockRead *pbantelope.Block
 	for {
-		el, err := consoleReader.ReadBlock()
+		out, err := reader()
+		if v, ok := out.(proto.Message); ok && !isNil(v) {
 
-		if el != nil && el.ToProtocol().(*pbantelope.Block) != nil {
-			block, ok := el.ToProtocol().(*pbantelope.Block)
-			ensure(ok, `Read block is not a "pbantelope.Block" but should have been`)
-
-			lastBlockRead = sanitizeBlock(block)
-			blocks = append(blocks, lastBlockRead)
+			// block := sanitizeBlock(out.(*pbantelope.Block))
+			block := out.(*pbantelope.Block)
+			blocks = append(blocks, block)
+			lastBlockRead = block
 		}
 
 		if err == io.EOF {
@@ -223,4 +244,9 @@ func ensure(condition bool, message string, args ...interface{}) {
 	if !condition {
 		quit(message, args...)
 	}
+}
+
+func quit(message string, args ...interface{}) {
+	fmt.Printf(message+"\n", args...)
+	os.Exit(1)
 }
