@@ -1,31 +1,21 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/streamingfast/bstream"
+	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
 	firecore "github.com/streamingfast/firehose-core"
-	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"io"
-	"io/ioutil"
 	"os"
-	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	pbts "github.com/golang/protobuf/ptypes/timestamp"
-	"github.com/klauspost/compress/zstd"
-	"github.com/lithammer/dedent"
-	"github.com/manifoldco/promptui"
 	"github.com/pinax-network/firehose-antelope/codec"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/logging"
-	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 var fixedTimestamp *pbts.Timestamp
@@ -55,10 +45,6 @@ func main() {
 	// to generate an expected.json file from the dmlog
 	generateExpected(inputFileName, outputFileName)
 	fmt.Printf("Decoded deep-mind log into JSON file: %s", outputFileName)
-}
-
-func makeSingleLineDiffCmd(cmd *exec.Cmd) string {
-	return strings.Replace(strings.Replace(strings.Replace(cmd.String(), "diff -C", `"diff -C`, 1), "| less", `| less"`, 1), "\n", ", ", -1)
 }
 
 func writeActualBlocks(actualFile string, blocks []*pbantelope.Block) {
@@ -98,6 +84,7 @@ func readActualBlocks(filePath string) []*pbantelope.Block {
 	defer file.Close()
 
 	lineChannel := make(chan string)
+
 	consoleReader, err := codec.NewConsoleReader(lineChannel, firecore.NewGenericBlockEncoder(int32(pbbstream.Protocol_EOS)), zlog, tracer)
 	if err != nil {
 		zlog.Fatal("failed to init console reader", zap.Error(err))
@@ -206,104 +193,6 @@ func sanitizeBlock(block *pbantelope.Block) *pbantelope.Block {
 	return block
 }
 
-func jsonEq(expectedFile string, actualFile string) bool {
-	expected, err := ioutil.ReadFile(expectedFile)
-	noError(err, "Unable to read %q", expectedFile)
-
-	actual, err := ioutil.ReadFile(actualFile)
-	noError(err, "Unable to read %q", actualFile)
-
-	var expectedJSONAsInterface, actualJSONAsInterface interface{}
-
-	err = json.Unmarshal(expected, &expectedJSONAsInterface)
-	noError(err, "Expected file %q is not a valid JSON file", expectedFile)
-
-	err = json.Unmarshal(actual, &actualJSONAsInterface)
-	noError(err, "Actual file %q is not a valid JSON file", actualFile)
-
-	return assert.ObjectsAreEqualValues(expectedJSONAsInterface, actualJSONAsInterface)
-}
-
-func askQuestion(label string, args ...interface{}) (answeredYes bool, wasAnswered bool) {
-	if !terminal.IsTerminal(int(os.Stdout.Fd())) {
-		zlog.Info("stdout is not a terminal, assuming no default")
-		wasAnswered = false
-		return
-	}
-
-	prompt := promptui.Prompt{
-		Label:     dedent.Dedent(fmt.Sprintf(label, args...)),
-		IsConfirm: true,
-	}
-
-	result, err := prompt.Run()
-	if err != nil {
-		zlog.Info("unable to aks user to see diff right now, too bad", zap.Error(err))
-		wasAnswered = false
-		return
-	}
-
-	wasAnswered = true
-	answeredYes = strings.ToLower(result) == "y" || strings.ToLower(result) == "yes"
-	return
-}
-
-func compressFile(file string) error {
-	compressedFile := file + ".zst"
-	encoder, _ := zstd.NewWriter(nil)
-
-	content, err := ioutil.ReadFile(file)
-	if err != nil {
-		return fmt.Errorf("unable to read file %q: %w", file, err)
-	}
-
-	return os.WriteFile(compressedFile, encoder.EncodeAll(content, nil), os.ModePerm)
-}
-
-func uncompressFile(file string) error {
-	compressedFile := file + ".zst"
-	decoder, _ := zstd.NewReader(nil)
-
-	content, err := ioutil.ReadFile(compressedFile)
-	if err != nil {
-		return fmt.Errorf("unable to read file %q: %w", compressedFile, err)
-	}
-
-	buf, err := decoder.DecodeAll(content, make([]byte, 0, len(content)))
-	if err != nil {
-		return fmt.Errorf("unable to decode file %q: %w", compressedFile, err)
-	}
-
-	return os.WriteFile(file, buf, os.ModePerm)
-}
-
-func fileExists(path string) bool {
-	stat, err := os.Stat(path)
-	if err != nil {
-		// For this script, we don't care
-		return false
-	}
-
-	return !stat.IsDir()
-}
-
-func ensure(condition bool, message string, args ...interface{}) {
-	if !condition {
-		quit(message, args...)
-	}
-}
-
-func noError(err error, message string, args ...interface{}) {
-	if err != nil {
-		quit(message+": "+err.Error(), args...)
-	}
-}
-
-func quit(message string, args ...interface{}) {
-	fmt.Printf(message+"\n", args...)
-	os.Exit(1)
-}
-
 func generateExpected(dmlogFile, expectedJsonFile string) {
 
 	actualBlocks := readActualBlocks(dmlogFile)
@@ -315,21 +204,6 @@ func generateExpected(dmlogFile, expectedJsonFile string) {
 	// noError(err, "Unable to compress file %q", expectedJsonFile)
 }
 
-func blockReaderFactory(reader io.Reader) (bstream.BlockReader, error) {
-	return bstream.NewDBinBlockReader(reader, func(contentType string, version int32) error {
-		protocol := pbbstream.Protocol(pbbstream.Protocol_value[contentType])
-		if protocol != pbbstream.Protocol_EOS && version != 1 {
-			return fmt.Errorf("reader only knows about %s block kind at version 1, got %s at version %d", protocol, contentType, version)
-		}
-
-		return nil
-	})
-}
-
-func blockWriterFactory(writer io.Writer) (bstream.BlockWriter, error) {
-	return bstream.NewDBinBlockWriter(writer, pbbstream.Protocol_EOS.String(), 1)
-}
-
 func MarshalWithOptions(m proto.Message, indent string, emitUnpopulated bool) (string, error) {
 	res, err := protojson.MarshalOptions{Indent: indent, EmitUnpopulated: emitUnpopulated}.Marshal(m)
 	if err != nil {
@@ -337,4 +211,16 @@ func MarshalWithOptions(m proto.Message, indent string, emitUnpopulated bool) (s
 	}
 
 	return string(res), err
+}
+
+func noError(err error, message string, args ...interface{}) {
+	if err != nil {
+		quit(message+": "+err.Error(), args...)
+	}
+}
+
+func ensure(condition bool, message string, args ...interface{}) {
+	if !condition {
+		quit(message, args...)
+	}
 }
