@@ -124,8 +124,7 @@ func readActualBlocks(filePath string) []*pbantelope.Block {
 		out, err := reader()
 		if v, ok := out.(proto.Message); ok && !isNil(v) {
 
-			// block := sanitizeBlock(out.(*pbantelope.Block))
-			block := out.(*pbantelope.Block)
+			block := sanitizeBlock(out.(*pbantelope.Block))
 			blocks = append(blocks, block)
 			lastBlockRead = block
 		}
