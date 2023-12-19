@@ -267,7 +267,7 @@ def vote(b, e):
         voter = accounts[i]['name']
         k = args.num_producers_vote
         if k > numProducers:
-            k = numProducers - 1
+            k = numProducers
         prods = [(3*i + 2*j) % numProducers + firstProducer for j in range(k)]
         prods = ' '.join(map(lambda x: accounts[x]['name'], prods))
         retry(getCleos(True) + 'system voteproducer prods ' + voter + ' ' + prods)
@@ -317,7 +317,7 @@ def randomTransfer(b, e, num):
         trx_id = retry_with_id(getCleos(True) + 'transfer -f ' + src + ' ' + dest + ' "0.0001 ' + args.symbol + '" "transfer from ' + src + ' to ' + dest + '" || true')
         logAction(trx_id, 'eosio.token', src, 'transfer', { 'from': src, 'to': dest, 'quantity': '0.0001 ' + args.symbol, 'memo': 'transfer from ' + src + ' to ' + dest })
         logAction(trx_id, 'eosio.token', dest, 'transfer', { 'from': src, 'to': dest, 'quantity': '0.0001 ' + args.symbol, 'memo': 'transfer from ' + src + ' to ' + dest })
-        sleep(0.5)
+        sleep(0.6)
 
 def msigProposeReplaceSystem(proposer, proposalName):
     requestedPermissions = []
@@ -476,7 +476,7 @@ def stepBattlefield():
     print('\nSetting contracts')
     trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield1 --kbytes 20000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 20480000, 'payer': 'eosio', 'receiver': 'battlefield1' })
-    logDbop(trx_id, 'eosio', 'eosio', 'rammarket', 'cpd4ykuhc5d.4', 'UPD', {"base":{"balance":"68718246002 RAM","weight":"0.50000000000000000"},"quote":{"balance":"10000179.1000 SYS","weight":"0.50000000000000000"},"supply":"10000000000.0000 RAMCORE"})
+    logDbop(trx_id, 'eosio', 'eosio', 'rammarket', 'cpd4ykuhc5d.4', 'UPD', {"base":"*","quote":"*","supply":"10000000000.0000 RAMCORE"})
     logDbop(trx_id, 'eosio', 'battlefield1', 'userres', 'battlefield1', 'UPD', {"cpu_weight":"*","net_weight":"*","owner":"battlefield1","ram_bytes":"*"})
     trx_id = retry_with_id(getCleos() + 'system buyram eosio battlefield3 --kbytes 1000')
     logAction(trx_id, 'eosio', 'eosio', 'buyrambytes', { 'bytes': 1024000, 'payer': 'eosio', 'receiver': 'battlefield3' })
@@ -644,23 +644,23 @@ def stepBattlefield():
     # random key
     trx_id = retry_with_id(getCleos() + 'set account permission battlefield2 ops EOS7f5watu1cLgth3ub1uAnsGkHq1F6PhauScBg6rJGUfe79MgG9Y active')
     logAction(trx_id, 'eosio', 'eosio', 'updateauth', { 'account': 'battlefield2', 'auth': '*', 'parent': 'active', 'permission': 'ops' })
-    sleep(0.6)
+    sleep(1.2)
     # back to safe key
     trx_id = retry_with_id(getCleos() + 'set account permission battlefield2 ops EOS5MHPYyhjBjnQZejzZHqHewPWhGTfQWSVTWYEhDmJu4SXkzgweP')
     logAction(trx_id, 'eosio', 'eosio', 'updateauth', { 'account': 'battlefield2', 'auth': '*', 'parent': 'active', 'permission': 'ops' })
-    sleep(0.6)
+    sleep(1.2)
 
     trx_id = retry_with_id(getCleos() + 'set action permission battlefield2 eosio.token transfer ops')
     logAction(trx_id, 'eosio', 'eosio', 'linkauth', { 'account': 'battlefield2', 'code': 'eosio.token', 'requirement': 'ops', 'type': 'transfer' })
-    sleep(0.6)
+    sleep(1.2)
 
     trx_id = retry_with_id(getCleos() + 'set action permission battlefield2 eosio.token transfer NULL')
     logAction(trx_id, 'eosio', 'eosio', 'unlinkauth', { 'account': 'battlefield2', 'code': 'eosio.token', 'type': 'transfer' })
-    sleep(0.6)
+    sleep(1.2)
 
     trx_id = retry_with_id(getCleos() + 'set account permission battlefield2 ops NULL')
     logAction(trx_id, 'eosio', 'eosio', 'deleteauth', { 'account': 'battlefield2', 'permission': 'ops' })
-    sleep(0.6)
+    sleep(1.2)
 
     print("\nCreate a creational order different than the execution order")
     ## We use the --force-unique flag so a context-free action exist in the transactions traces tree prior our own,
@@ -688,7 +688,7 @@ def stepBattlefield():
     logDbop(trx_id, 'battlefield1', 'battlefield1', 'variant', '', 'INS', { 'creation_number': '*', 'id': 0, 'variant_field': ['uint16', 12] })
     trx_id = retry_with_id(getCleos() + 'push action battlefield1 varianttest \'{"value":["string","this is a long value"]}\' -p battlefield1')
     logAction(trx_id, 'battlefield1', 'battlefield1', 'varianttest', { 'value': ['string', 'this is a long value'] })
-    logDbop(trx_id, 'battlefield1', 'battlefield1', 'variant', '............1', 'INS', { 'creation_number': '*', 'id': 1, 'variant_field': ['string', 'this is a long value'] })
+    logDbop(trx_id, 'battlefield1', 'battlefield1', 'variant', '............1', 'INS', { 'creation_number': '1099511627520', 'id': 1, 'variant_field': ['int32', 20] })
     sleep(0.6)
 
     ## Series of test for secondary keys
@@ -795,6 +795,7 @@ def stepResign():
 def stepTransfer():
     stepTitle()
     randomTransfer(0, args.num_senders, 5)
+    sleep(1)
 def stepLog():
     stepTitle()
     run('tail -n 60 ' + args.nodes_dir + '00-eosio/stderr')

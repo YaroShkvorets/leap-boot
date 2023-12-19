@@ -14,7 +14,7 @@ python3 ./python/boot.py \
     --nodeos=nodeos \
     --keosd=keosd \
     --user-limit=15 \
-    --producer-limit=3 \
+    --producer-limit=1 \
     --producer-sync-delay=5 \
     --contracts-dir="./system-contracts-3.1" \
     -w -a -k
