@@ -3,7 +3,6 @@
 import argparse
 import json
 import os
-import random
 import re
 import subprocess
 import sys
@@ -11,6 +10,7 @@ import time
 import inspect
 
 from log import initLogging, logAction, logDbop
+
 
 args = None
 logFile = None
@@ -213,7 +213,8 @@ def intToCurrency(i):
     return '%d.%04d %s' % (i // 10000, i % 10000, args.symbol)
 
 def allocateFunds(b, e):
-    dist = [random.paretovariate(1.161) for _ in range(e - b)]
+    num_points = e - b
+    dist = [10 + b + i * (e - b) / (num_points - 1) for i in range(num_points)]
     dist.sort()
     dist.reverse()
     dist = list(map(float, dist))
@@ -267,7 +268,7 @@ def vote(b, e):
         k = args.num_producers_vote
         if k > numProducers:
             k = numProducers - 1
-        prods = random.sample(range(firstProducer, firstProducer + numProducers), k)
+        prods = [(3*i + 2*j) % numProducers + firstProducer for j in range(k)]
         prods = ' '.join(map(lambda x: accounts[x]['name'], prods))
         retry(getCleos(True) + 'system voteproducer prods ' + voter + ' ' + prods)
 
@@ -309,11 +310,10 @@ def resign(account, controller):
     run(getCleos(True) + 'get account ' + account)
 
 def randomTransfer(b, e, num):
+    senders = e - b - 1
     for j in range(num):
-        src = accounts[random.randint(b, e - 1)]['name']
-        dest = src
-        while dest == src:
-            dest = accounts[random.randint(b, e - 1)]['name']
+        src = accounts[b + j % senders]['name']
+        dest = accounts[b + (j + 1) % senders]['name']
         trx_id = retry_with_id(getCleos(True) + 'transfer -f ' + src + ' ' + dest + ' "0.0001 ' + args.symbol + '" "transfer from ' + src + ' to ' + dest + '" || true')
         logAction(trx_id, 'eosio.token', src, 'transfer', { 'from': src, 'to': dest, 'quantity': '0.0001 ' + args.symbol, 'memo': 'transfer from ' + src + ' to ' + dest })
         logAction(trx_id, 'eosio.token', dest, 'transfer', { 'from': src, 'to': dest, 'quantity': '0.0001 ' + args.symbol, 'memo': 'transfer from ' + src + ' to ' + dest })
