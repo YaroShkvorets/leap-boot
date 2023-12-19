@@ -1,4 +1,5 @@
 #include "battlefield.hpp"
+#include <limits>
 
 void battlefield::dbins(name account)
 {
@@ -533,6 +534,45 @@ void battlefield::sktest(name action)
         auto sk_multi_id = sk_multi_table.available_primary_key() - 1;
         auto itr_multi = sk_multi_table.require_find(sk_multi_id);
         sk_multi_table.erase(itr_multi);
+    }
+    else if (action == "insert.big"_n)
+    {
+        sk_i64_table.emplace(_self, [&](auto &row) {
+            row.id = sk_i64_table.available_primary_key();
+            row.i64 = std::numeric_limits<int64_t>::max();
+        });
+
+        sk_i128_table.emplace(_self, [&](auto &row) {
+            row.id = sk_i128_table.available_primary_key();
+            row.i128 = std::numeric_limits<uint128_t>::max();
+        });
+
+        sk_d64_table.emplace(_self, [&](auto &row) {
+            row.id = sk_d64_table.available_primary_key();
+            row.d64 = std::numeric_limits<double>::max();
+        });
+
+        sk_d128_table.emplace(_self, [&](auto &row) {
+            row.id = sk_d128_table.available_primary_key();
+            row.d128 = std::numeric_limits<long double>::max();
+        });
+
+        sk_c256_table.emplace(_self, [&](auto &row) {
+            row.id = sk_c256_table.available_primary_key();
+
+            uint128_t part = uint128_t(0xFFFFFFFFFFFFFFFF) << 64 | uint128_t(0xFFFFFFFFFFFFFFFF);
+            std::array<uint128_t, 2> words = {part, part};
+
+            row.c256 = checksum256(words);
+        });
+
+        sk_multi_table.emplace(_self, [&](auto &row) {
+            row.id = sk_multi_table.available_primary_key();
+            row.i64 = uint64_t(row.id + 1);
+            row.i128 = uint128_t(row.id + 2);
+            row.d64 = double(row.id) + 3.1;
+            row.d128 = (long double)(row.id) + (long double)(4.6);
+        });
     }
     else
     {
