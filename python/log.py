@@ -17,6 +17,7 @@ class JsonFormatter(logging.Formatter):
             json_record["account"] = dict.get("account")
             json_record["receiver"] = dict.get("receiver")
             json_record["params"] = dict.get("params")
+            json_record["retvalue"] = dict.get("retvalue")
             
         if record.msg == "dbop":
             json_record["trx_id"] = dict.get("trx_id")
@@ -36,8 +37,8 @@ def initLogging(filename):
     logging.getLogger().setLevel(logging.INFO)
 
 
-def logAction(trx_id, account, receiver, action_name, params):
-    logging.info("action", extra={"trx_id": trx_id, "action_name": action_name, "account": account, "receiver": receiver, "params": params})
+def logAction(trx_id, account, receiver, action_name, params, retvalue=""):
+    logging.info("action", extra={"trx_id": trx_id, "action_name": action_name, "account": account, "receiver": receiver, "params": params, "retvalue": retvalue})
     
 def logDbop(trx_id, code, scope, table_name, pkey, op, fields):
     if op not in ['INS', 'UPD', 'REM']:

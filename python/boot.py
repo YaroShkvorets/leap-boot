@@ -733,7 +733,7 @@ def stepBattlefield():
     sleep(0.6)
 
     trx_id = retry_with_id(getCleos() + 'push action battlefield1 retvalue \'{"n":100}\' -p battlefield1')
-    logAction(trx_id, 'battlefield1', 'battlefield1', 'retvalue', { 'n': 100 })
+    logAction(trx_id, 'battlefield1', 'battlefield1', 'retvalue', { 'n': 100 }, "101")
     sleep(0.6)
 
     trx_id = retry_with_id(getCleos() + 'push action battlefield1 binexttest \'[bintest]\' -p battlefield1')

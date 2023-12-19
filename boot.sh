@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+mkdir ./run 2> /dev/null
 
 echo "Booting up the chain ..."
 sleep 3

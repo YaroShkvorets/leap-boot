@@ -27,6 +27,7 @@ def find_action(expected_action, actions, start_index):
             and actions[i]['receiver'] == expected_action['receiver']
             and action['account'] == expected_action['account']
             and action['name'] == expected_action['action_name']
+            and actions[i]['jsonReturnValue'] == expected_action['retvalue']
             and compare(actions[i]['trx_id'], expected_action['params'], action['jsonData'])
         ):
             return i
