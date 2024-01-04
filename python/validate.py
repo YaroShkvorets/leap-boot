@@ -120,7 +120,7 @@ def main():
     if failed > 0:
         bail("🛑 Failed %d out of %d actions and db_ops - see above" % (failed, actions + db_ops))
     
-    print("✅ Validated %d actions and %d db_ops successfully" % (actions, db_ops))
+    print("✅ Validated all actions and db_ops successfully")
 
 
 

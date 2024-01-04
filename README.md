@@ -1,6 +1,6 @@
-# leap-boot
+# deep
 
-These scripts are used to test deep-mind logs produced by leap, their0 decoding and validation against expected data
+These scripts are used to generate and validate deep-mind logs produced by leap boot and battlefield process
 
 ## Prerequsites
 * Ubuntu 20.04/22.04
@@ -15,20 +15,20 @@ $ ./boot.sh
 ```
 This will boot the nodes, set system contracts, run test actions, etc. Also the script will generate two log files:
 
-* `./run/dm.log` - deep-mind log for the entire boot/test sequence,
-* `./run/expected.jsonl` - log of expected actions and dbops
+* `./run/deep-mind-x.x.x.dmlog` - deep-mind log for the entire boot/test sequence,
+* `./run/deep-mind-x.x.x.expected.jsonl` - log of expected actions and dbops
 
 ### Decode
 ```bash
 $ ./decode.sh
 ```
-This will decode deep-mind log into JSON using firehose decoder and generate `./run/dm.log.json` file
+This will decode deep-mind log into JSON using firehose decoder and generate `./run/deep-mind-x.x.x.dmlog.json` file
 
 ### Validate
 ```bash
-$ ./compare.sh
+$ ./validate.sh
 ```
-This will extract validate expected actions/dbops from `expected.jsonl` vs deep-mind produced logs
+This will extract validate expected actions/dbops from `deep-mind-x.x.x.expected.jsonl` vs deep-mind produced logs
 
 
 ## Known issues
